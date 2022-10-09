@@ -1,0 +1,49 @@
+[gd_scene load_steps=5 format=3 uid="uid://cf50xuqo704g3"]
+
+[ext_resource type="PackedScene" uid="uid://c7cmhu7x06w2c" path="res://Player.tscn" id="1_u6abr"]
+[ext_resource type="PackedScene" uid="uid://cc1kech0pf0vu" path="res://pill.tscn" id="3_g13kx"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4gg8d"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1l8l2"]
+
+[node name="World" type="Node3D"]
+
+[node name="DirectionalLight3d" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.933643, -0.27075, 0.234531, -1.11791e-08, 0.654741, 0.755853, -0.358205, -0.705697, 0.611294, 15.8945, 4.97019, 0)
+
+[node name="StaticBody3d" type="StaticBody3D" parent="."]
+transform = Transform3D(80.565, 0, 0, 0, 1.144, 0, 0, 0, 91.085, 0, 0, 0)
+
+[node name="CollisionShape3d" type="CollisionShape3D" parent="StaticBody3d"]
+shape = SubResource("BoxShape3D_4gg8d")
+
+[node name="MeshInstance3d" type="MeshInstance3D" parent="StaticBody3d"]
+mesh = SubResource("BoxMesh_1l8l2")
+
+[node name="StaticBody3d2" type="StaticBody3D" parent="."]
+transform = Transform3D(5.137, 0, 0, 0, 0.0722657, -5.6973, 0, 0.0719838, 5.71962, 0, 0, -1.19899)
+
+[node name="CollisionShape3d" type="CollisionShape3D" parent="StaticBody3d2"]
+shape = SubResource("BoxShape3D_4gg8d")
+
+[node name="MeshInstance3d" type="MeshInstance3D" parent="StaticBody3d2"]
+mesh = SubResource("BoxMesh_1l8l2")
+
+[node name="StaticBody3d3" type="StaticBody3D" parent="."]
+transform = Transform3D(15.4563, 0.308409, 2.14828, 0, 0.0111966, -99.961, -18.6172, 0.256046, 1.78354, -6.29258, 0, -1.19899)
+
+[node name="CollisionShape3d" type="CollisionShape3D" parent="StaticBody3d3"]
+shape = SubResource("BoxShape3D_4gg8d")
+
+[node name="MeshInstance3d" type="MeshInstance3D" parent="StaticBody3d3"]
+mesh = SubResource("BoxMesh_1l8l2")
+
+[node name="CharacterBody3d" parent="." instance=ExtResource("1_u6abr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.17094, 3.58832, 0.656615)
+floor_constant_speed = true
+floor_max_angle = 3.14159
+floor_snap_length = 0.05
+
+[node name="Pill" parent="." instance=ExtResource("3_g13kx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.59429, 2.68534, 6.42364)
