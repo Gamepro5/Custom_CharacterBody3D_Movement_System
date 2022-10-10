@@ -3,7 +3,8 @@ extends CharacterBody3D
 
 const SPEED = 10
 const JUMP_VELOCITY = 7
-var ACCELERATION = 8
+var ACCELERATION = 20
+var DECELERATION = 8
 var AIR_ACCELERATION = 1
 var mouse_axis = Vector2.ZERO
 var vertical
@@ -48,20 +49,20 @@ func _physics_process(delta):
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "forward", "backward")
 	var dir = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	"""
-	if dir:
-		vel.x = dir.x * SPEED
-		vel.z = dir.z * SPEED
-	else:
-		vel.x = move_toward(vel.x, 0, SPEED)
-		vel.z = move_toward(vel.z, 0, SPEED)
-	"""
+	
 	var temp = vel.y
 	if (on_floor):
-		vel = vel.lerp(dir*SPEED, ACCELERATION * delta)
+		if (dir.dot(vel) > 0):#(dir != Vector3.ZERO):
+			vel = vel.lerp(dir*SPEED, ACCELERATION * delta)
+		else:
+			vel = vel.lerp(dir*SPEED, DECELERATION * delta)
 	else:
 		vel = vel.lerp(dir*SPEED, AIR_ACCELERATION * delta)
 	vel.y = temp
+	
+	if (Vector3(vel.x,0,vel.z).length() < 0.001): #sigfigs!
+		vel.x = 0
+		vel.z = 0
 	
 	$Velocity.set_rotation(- $Velocity.get_parent().rotation)
 	$Velocity.target_position = vel/5;
@@ -122,8 +123,8 @@ func _physics_process(delta):
 			
 	else:
 		on_floor = false
-		print(last_col_normal, "  ", previous_vel.y)
-		if (last_col_normal == Vector3(0,1,0) && previous_vel.y == 0):
+		#print(last_col_normal, "  ", previous_vel.y)
+		if (last_col_normal == Vector3(0,1,0) && floor(previous_vel.y) == 0):
 			printerr("ERROR! Godot Collision Engine most likely reported a false negative just now. Snap Vector is: ", snap_vector)
 		vel.y -= gravity * delta
 		var col = move_and_collide(vel*delta)
@@ -134,9 +135,10 @@ func _physics_process(delta):
 		
 	previous_vel = vel
 	
-	$velx.text = "velocity.x = " + var_to_str(vel.x)
-	$vely.text = "velocity.y = " + var_to_str(vel.y)
-	$velz.text =  "velocity.z = " + var_to_str(vel.z)
+	$velx.text = "vel.x: " + var_to_str(vel.x)
+	$vely.text = "vel.y: " + var_to_str(vel.y)
+	$velz.text = "vel.z: " + var_to_str(vel.z)
+	$velmag.text = "vel mag: " + var_to_str(Vector3(vel.x,0,vel.z).length())
 	label2.text = "on_floor: " + var_to_str(on_floor)
 	
 	
