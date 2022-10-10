@@ -2,14 +2,15 @@ extends CharacterBody3D
 
 
 const SPEED = 10
-const JUMP_VELOCITY = 10
-var ACCELERATION = 5
+const JUMP_VELOCITY = 7
+var ACCELERATION = 8
+var AIR_ACCELERATION = 1
 var mouse_axis = Vector2.ZERO
 var vertical
 var horizontal
 var gravity = 15#ProjectSettings.get_setting("physics/3d/default_gravity")
 var vel = Vector3(0,0,0)
-var max_floor_angle = deg_to_rad(89)
+var max_floor_angle = deg_to_rad(65)
 var last_col_normal = Vector3.UP
 @onready var label = $VelocityLabel
 @onready var label2 = $on_floor
@@ -56,7 +57,10 @@ func _physics_process(delta):
 		vel.z = move_toward(vel.z, 0, SPEED)
 	"""
 	var temp = vel.y
-	vel = vel.lerp(dir*SPEED, ACCELERATION * delta)
+	if (on_floor):
+		vel = vel.lerp(dir*SPEED, ACCELERATION * delta)
+	else:
+		vel = vel.lerp(dir*SPEED, AIR_ACCELERATION * delta)
 	vel.y = temp
 	
 	$Velocity.set_rotation(- $Velocity.get_parent().rotation)
@@ -72,7 +76,7 @@ func _physics_process(delta):
 	#(0.01+vel.length()*delta)
 	#var snap_vector = Vector3.DOWN*(rad_to_deg(last_col_normal.angle_to(Vector3.UP))+1)*10
 	if (snap_vector != Vector3.ZERO): # we don't want to snap if we received an impulse (like jumping)!
-		snap_vector = -last_col_normal * (abs(vel.y)+1) * 0.01
+		snap_vector = -last_col_normal * (abs(vel.y)+10) * 0.01
 	
 	if Input.is_action_just_pressed("jump") and on_floor:
 		last_col_normal = Vector3.UP
@@ -84,16 +88,16 @@ func _physics_process(delta):
 	$snapVector.target_position = snap_vector;
 	#print(snap_vector)
 	var ground_check = move_and_collide(snap_vector, true)
-	#if !ground_check:
-		#ground_check = move_and_collide(Vector3.DOWN * (abs(vel.y)+0.1) * 0.005, true)
-	if ground_check: #on floor
+	if !ground_check && snap_vector != Vector3.ZERO:
+		ground_check = move_and_collide( Vector3.DOWN * (abs(vel.y)+0.1) * 0.005, true)
+	if ground_check:
 		var normal = ground_check.get_normal()
-		ground_check = move_and_collide(Vector3.DOWN*0.05, true)
-		if !ground_check:
-			move_and_collide(Vector3.DOWN*0.5) #snap
-		vel.y = 0;
 		last_col_normal = normal;
 		if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
+			ground_check = move_and_collide(Vector3.DOWN*0.05, true)
+			if !ground_check:
+				move_and_collide(Vector3.DOWN*0.5) #snap
+			vel.y = 0;
 			on_floor = true
 			vel.y = (-normal.z*vel.z-normal.x*vel.x)/normal.y
 			if (normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
@@ -114,16 +118,17 @@ func _physics_process(delta):
 				on_floor = false
 				velocity = vel
 				move_and_slide() #placeholder
+				vel = velocity
 			
 	else:
 		on_floor = false
 		print(last_col_normal, "  ", previous_vel.y)
 		if (last_col_normal == Vector3(0,1,0) && previous_vel.y == 0):
-			push_error("ERROR! Godot Collision Engine most likely reported a false negative just now. Snap Vector is: ", snap_vector)
-			on_floor = true;
+			printerr("ERROR! Godot Collision Engine most likely reported a false negative just now. Snap Vector is: ", snap_vector)
 		vel.y -= gravity * delta
 		var col = move_and_collide(vel*delta)
 		if col:
+			last_col_normal = col.get_normal()
 			snap_vector = -last_col_normal * (abs(vel.y)+1) * 0.01
 	
 		

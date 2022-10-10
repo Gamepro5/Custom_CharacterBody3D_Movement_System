@@ -17,6 +17,7 @@ shape = SubResource("CapsuleShape3D_1js60")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.567, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
+current = true
 
 [node name="Camera2" type="Camera3D" parent="Head"]
 transform = Transform3D(1, 0, 0, 0, 0.940371, 0.34015, 0, -0.34015, 0.940371, 0, 2.53898, 3.67285)
@@ -48,7 +49,6 @@ collide_with_bodies = false
 debug_shape_custom_color = Color(0, 0, 1, 1)
 
 [node name="MeshInstance3d" type="MeshInstance3D" parent="."]
-visible = false
 mesh = SubResource("CapsuleMesh_56ycl")
 
 [node name="velx" type="Label" parent="."]
