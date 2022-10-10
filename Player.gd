@@ -21,6 +21,8 @@ var on_wall = false;
 var on_ceiling = false;
 var impulse_vel = Vector3.ZERO
 var snap_vector = Vector3.UP
+var snap_magnitude = 0.01;
+
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
@@ -77,7 +79,7 @@ func _physics_process(delta):
 	#(0.01+vel.length()*delta)
 	#var snap_vector = Vector3.DOWN*(rad_to_deg(last_col_normal.angle_to(Vector3.UP))+1)*10
 	if (snap_vector != Vector3.ZERO): # we don't want to snap if we received an impulse (like jumping)!
-		snap_vector = -last_col_normal * (abs(vel.y)+10) * 0.01
+		snap_vector = -last_col_normal * (abs(vel.y)+10) * snap_magnitude
 	
 	if Input.is_action_just_pressed("jump") and on_floor:
 		last_col_normal = Vector3.UP
@@ -124,13 +126,13 @@ func _physics_process(delta):
 	else:
 		on_floor = false
 		#print(last_col_normal, "  ", previous_vel.y)
-		if (last_col_normal == Vector3(0,1,0) && floor(previous_vel.y) == 0):
+		if (last_col_normal == Vector3(0,1,0) && floor(previous_vel.y) == 0 && snap_vector != Vector3.ZERO):
 			printerr("ERROR! Godot Collision Engine most likely reported a false negative just now. Snap Vector is: ", snap_vector)
 		vel.y -= gravity * delta
 		var col = move_and_collide(vel*delta)
 		if col:
 			last_col_normal = col.get_normal()
-			snap_vector = -last_col_normal * (abs(vel.y)+1) * 0.01
+			snap_vector = -last_col_normal * (abs(vel.y)+1) * snap_magnitude
 	
 		
 	previous_vel = vel
