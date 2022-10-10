@@ -30,6 +30,15 @@ shape = SubResource("BoxShape3D_4gg8d")
 [node name="MeshInstance3d" type="MeshInstance3D" parent="StaticBody3d2"]
 mesh = SubResource("BoxMesh_1l8l2")
 
+[node name="StaticBody3d4" type="StaticBody3D" parent="."]
+transform = Transform3D(22.7122, -0.287422, -23.3805, 0, 0.425092, -34.3102, 20.9942, 0.310942, 25.2938, 10.4741, 0, -1.19899)
+
+[node name="CollisionShape3d" type="CollisionShape3D" parent="StaticBody3d4"]
+shape = SubResource("BoxShape3D_4gg8d")
+
+[node name="MeshInstance3d" type="MeshInstance3D" parent="StaticBody3d4"]
+mesh = SubResource("BoxMesh_1l8l2")
+
 [node name="StaticBody3d3" type="StaticBody3D" parent="."]
 transform = Transform3D(15.4563, 0.308409, 2.14828, 0, 0.0111966, -99.961, -18.6172, 0.256046, 1.78354, -6.29258, 0, -1.19899)
 
@@ -39,11 +48,8 @@ shape = SubResource("BoxShape3D_4gg8d")
 [node name="MeshInstance3d" type="MeshInstance3D" parent="StaticBody3d3"]
 mesh = SubResource("BoxMesh_1l8l2")
 
-[node name="CharacterBody3d" parent="." instance=ExtResource("1_u6abr")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.17094, 3.58832, 0.656615)
-floor_constant_speed = true
-floor_max_angle = 3.14159
-floor_snap_length = 0.05
-
 [node name="Pill" parent="." instance=ExtResource("3_g13kx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.59429, 2.68534, 6.42364)
+
+[node name="CharacterBody3d" parent="." instance=ExtResource("1_u6abr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.311509, 1.65135, 1.28223)

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Player.gd" id="1_t7smq"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_p5nwa"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1js60"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_56ycl"]
 
@@ -11,27 +11,72 @@ floor_snap_length = 0.0
 script = ExtResource("1_t7smq")
 
 [node name="CollisionShape3d" type="CollisionShape3D" parent="."]
-shape = SubResource("CapsuleShape3D_p5nwa")
+shape = SubResource("CapsuleShape3D_1js60")
 
 [node name="Head" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.567, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
-visible = false
 
 [node name="Camera2" type="Camera3D" parent="Head"]
-transform = Transform3D(1, 0, 0, 0, 0.959294, 0.282408, 0, -0.282408, 0.959294, 0, 1.24961, 3.17652)
+transform = Transform3D(1, 0, 0, 0, 0.940371, 0.34015, 0, -0.34015, 0.940371, 0, 2.53898, 3.67285)
 current = true
 
-[node name="RayCast3d" type="RayCast3D" parent="."]
+[node name="Velocity" type="RayCast3D" parent="."]
 target_position = Vector3(1, 0, 0)
+collision_mask = 0
+collide_with_bodies = false
 debug_shape_custom_color = Color(1, 0, 0, 1)
 
+[node name="snapVector" type="RayCast3D" parent="."]
+target_position = Vector3(1, 0, 0)
+collision_mask = 0
+collide_with_bodies = false
+debug_shape_custom_color = Color(1, 1, 0, 1)
+debug_shape_thickness = 4
+
+[node name="SurfaceNormal" type="RayCast3D" parent="."]
+target_position = Vector3(1, 0, 0)
+collision_mask = 0
+collide_with_bodies = false
+debug_shape_custom_color = Color(0, 1, 0, 1)
+
+[node name="HorizontalVel" type="RayCast3D" parent="."]
+target_position = Vector3(1, 0, 0)
+collision_mask = 0
+collide_with_bodies = false
+debug_shape_custom_color = Color(0, 0, 1, 1)
+
 [node name="MeshInstance3d" type="MeshInstance3D" parent="."]
+visible = false
 mesh = SubResource("CapsuleMesh_56ycl")
 
-[node name="VelocityLabel" type="Label" parent="."]
-offset_left = 27.0
-offset_top = 21.0
-offset_right = 67.0
-offset_bottom = 44.0
+[node name="velx" type="Label" parent="."]
+offset_left = 9.0
+offset_top = 9.0
+offset_right = 70.0
+offset_bottom = 35.0
+text = "vel_x
+"
+
+[node name="vely" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 37.0
+offset_right = 71.0
+offset_bottom = 63.0
+text = "vel_y"
+
+[node name="velz" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 66.0
+offset_right = 71.0
+offset_bottom = 92.0
+text = "vel_z"
+
+[node name="on_floor" type="Label" parent="."]
+offset_left = 12.0
+offset_top = 95.0
+offset_right = 76.0
+offset_bottom = 121.0
+text = "on_floor
+"
