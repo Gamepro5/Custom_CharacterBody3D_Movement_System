@@ -9,52 +9,83 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -10.0
 offset_bottom = -13.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="velx" type="Label" parent="."]
+[node name="pos" type="Label" parent="."]
 layout_mode = 1
 offset_left = 9.0
 offset_top = 9.0
 offset_right = 70.0
 offset_bottom = 35.0
+text = "pos"
+
+[node name="velx" type="Label" parent="."]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 40.0
+offset_right = 66.0
+offset_bottom = 66.0
 text = "vel_x
 "
 
 [node name="vely" type="Label" parent="."]
-layout_mode = 1
-offset_left = 10.0
-offset_top = 37.0
-offset_right = 71.0
-offset_bottom = 63.0
+layout_mode = 0
+offset_left = 6.0
+offset_top = 68.0
+offset_right = 67.0
+offset_bottom = 94.0
 text = "vel_y"
 
 [node name="velz" type="Label" parent="."]
-layout_mode = 1
-offset_left = 10.0
-offset_top = 66.0
-offset_right = 71.0
-offset_bottom = 92.0
+layout_mode = 0
+offset_left = 6.0
+offset_top = 97.0
+offset_right = 67.0
+offset_bottom = 123.0
 text = "vel_z"
 
 [node name="on_floor" type="Label" parent="."]
-layout_mode = 1
-offset_left = 10.0
-offset_top = 119.0
-offset_right = 74.0
-offset_bottom = 145.0
+layout_mode = 0
+offset_left = 6.0
+offset_top = 150.0
+offset_right = 70.0
+offset_bottom = 176.0
 text = "on_floor
 "
 
-[node name="velmag" type="Label" parent="."]
+[node name="on_wall" type="Label" parent="."]
 layout_mode = 1
-offset_left = 9.0
-offset_top = 93.0
+offset_left = 6.0
+offset_top = 172.0
 offset_right = 70.0
-offset_bottom = 119.0
+offset_bottom = 224.0
+text = "on_wall
+
+"
+
+[node name="on_ceiling" type="Label" parent="."]
+layout_mode = 1
+offset_left = 7.0
+offset_top = 195.0
+offset_right = 84.0
+offset_bottom = 247.0
+text = "on_ceiling
+
+"
+
+[node name="velmag" type="Label" parent="."]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 121.0
+offset_right = 69.0
+offset_bottom = 147.0
 text = "vel_mag
 "
 
 [node name="Console" type="Control" parent="."]
 visible = false
+layout_mode = 1
 anchors_preset = 0
 offset_left = 2.0
 offset_top = 8.0

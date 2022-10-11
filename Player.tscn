@@ -19,6 +19,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.567, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
 current = true
+fov = 90.0
 
 [node name="Camera2" type="Camera3D" parent="Head"]
 transform = Transform3D(1, 0, 0, 0, 0.940371, 0.34015, 0, -0.34015, 0.940371, 0, 2.53898, 3.67285)
@@ -53,5 +54,3 @@ debug_shape_custom_color = Color(0, 0, 1, 1)
 mesh = SubResource("CapsuleMesh_56ycl")
 
 [node name="UI" parent="." instance=ExtResource("2_ym6sr")]
-grow_horizontal = 2
-grow_vertical = 2

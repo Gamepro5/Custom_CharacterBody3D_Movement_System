@@ -11,27 +11,57 @@ enum {#useless rn
 }
 
 const convars = [
-	["cl_apply_impulse", [ARG_FLOAT, ARG_FLOAT, ARG_FLOAT, ARG_BOOL]]
+	["cl_apply_impulse", [ARG_FLOAT, ARG_FLOAT, ARG_FLOAT, ARG_BOOL]],
+	["quit", []],
+	["cl_set_pos", [ARG_FLOAT, ARG_FLOAT, ARG_FLOAT]],
+	["thirdperson",[]],
+	["firstperson", []],
+	["fov_desired", [ARG_INT]]
 ]
 
 func cl_apply_impulse(params):
 	player.apply_impulse([ [str_to_var(params[0]), str_to_var(params[1]), str_to_var(params[2])] , str_to_var(params[3]) ])
 
+func quit(params):
+	get_tree().quit() # Quits the game
+	
+func cl_set_pos(params):
+	player.position.x = str_to_var(params[0])
+	player.position.y = str_to_var(params[1])
+	player.position.z = str_to_var(params[2])
 
+func thirdperson(params):
+	player.get_node("Head").get_node("Camera2").set_current(true)
+	player.get_node("Head").get_node("Camera").set_current(false)
+	
+func firstperson(params):
+	player.get_node("Head").get_node("Camera2").set_current(false)
+	player.get_node("Head").get_node("Camera").set_current(true)
+
+func fov_desired(params):
+	player.get_node("Head").get_node("Camera2").set_fov(str_to_var(params[0]))
+	player.get_node("Head").get_node("Camera").set_fov(str_to_var(params[0]))
+	
 func evaluate_input(input:String):
-	var params = input.split(" ")
-	params = Array(params)
-	for i in range(convars.size()):
-		if (params[0] == convars[i][0]):
-			if params.size()-1 != convars[i][1].size():
-				output.text += "Error! Too many params given to convar '" + convars[i][0] + "'. Expected exactly " + var_to_str(convars[i][1].size()) + ". You gave: " + var_to_str(params.size()-1) + ".\n"
-			else:#execute command
-				var temp = params.duplicate()
-				temp.pop_front()
-				call(params[0], temp) #todo: add a better param type check
-				output.text += "'" + input + "'" + " executed.\n"
-		else:
-			output.text += "Error! Invalid convar: '" + params[0] + "'.\n"
+	for k in input.split(";"):
+		var params = k.split(" ")
+		params = Array(params)
+		var found = false;
+		for i in range(convars.size()):
+			if (params[0] == convars[i][0]):
+				if params.size()-1 != convars[i][1].size():
+					output.text = "Error! Too many params given to convar '" + convars[i][0] + "'. Expected exactly " + var_to_str(convars[i][1].size()) + ". You gave: " + var_to_str(params.size()-1) + ".\n" + output.text
+					found = true
+					break
+				else:#execute command
+					var temp = params.duplicate()
+					temp.pop_front()
+					call(params[0], temp) #todo: add a better param type check
+					output.text = "'" + k + "'" + " executed.\n" + output.text
+					found = true
+					break
+		if !found:
+			output.text = "Error! Invalid convar: '" + params[0] + "'.\n" + output.text
 		
 
 func _input(event: InputEvent) -> void:

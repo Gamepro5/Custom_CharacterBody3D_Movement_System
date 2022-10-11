@@ -60,6 +60,10 @@ func _input(event: InputEvent) -> void:
 
 func apply_impulse(vect: Array):
 	cached_impulses.append(vect)
+	
+func _process(delta):
+	#print(cached_impulses)
+	pass
 
 func _physics_process(delta):
 	
@@ -135,39 +139,52 @@ func _physics_process(delta):
 	$snapVector.target_position = snap_vector;
 	#print(snap_vector)
 	var ground_check
-	if (snap_vector!=Vector3.ZERO):
+	if (snap_vector!=Vector3.ZERO): # snap vector is only unset from zero in the "in air" part of this code, where a collision would set it to Vector3.DOWN
 		ground_check = move_and_collide(snap_vector, true, 0.001, true)
 	if !ground_check && snap_vector != Vector3.ZERO:
-		ground_check = move_and_collide( Vector3.DOWN * (abs(vel.y)+0.1) * 0.005, true)
+		ground_check = move_and_collide( Vector3.DOWN * (abs(vel.y)+0.1) * 0.005, true) #this is here to snap down if you just climbed a slope that is so steep that you would otherwise go flying.
 	if ground_check:
 		var normal = ground_check.get_normal()
 		last_col_normal = normal;
-		if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
-			ground_check = move_and_collide(Vector3.DOWN*0.005, true, 0.001, true)
-			if !ground_check:
-				move_and_collide(Vector3.DOWN*0.5) #snap
-			vel.y = 0;
-			on_floor = true
-			vel.y = (-normal.z*vel.z-normal.x*vel.x)/normal.y
-			if (normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
-				vel.y = 0
-		### this may need to be done recursively
-		var col = move_and_collide(vel*delta)
-		if col:
-			normal = col.get_normal()
-			last_col_normal = normal;
+		for i in range(ground_check.get_collision_count()): #there may be several collisions 
+			normal = ground_check.get_normal(i)
 			if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
+				var ground_check2 = move_and_collide(Vector3.DOWN*0.005, true, 0.001, true) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector.
+				if !ground_check2:
+					move_and_collide(Vector3.DOWN*0.5) #snap
+				vel.y = 0;
 				on_floor = true
+				on_ceiling = false #temporary, not nessesarily true
 				vel.y = (-normal.z*vel.z-normal.x*vel.x)/normal.y
 				if (normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
 					vel.y = 0
-				move_and_collide(vel*delta)
-		###
-			else: #slope is not the floor. it is either a ceiling or a wall.
-				on_floor = false
-				velocity = vel
-				move_and_slide() #placeholder
-				vel = velocity
+		### this may need to be done recursively
+		var col = move_and_collide(vel*delta) #actually move!
+		if col:
+			normal = col.get_normal()
+			last_col_normal = normal;
+			for i in range(col.get_collision_count()):
+				normal = col.get_normal(i)
+				if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
+					on_floor = true
+					
+					on_wall = false #temporary, not nessesarily true
+					on_ceiling = false #temporary, not nessesarily true
+					
+					vel.y = (-normal.z*vel.z-normal.x*vel.x)/normal.y
+					if (normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
+						vel.y = 0
+					move_and_collide(vel*delta) #move the remainder of the distnace up the slope
+			###
+				else: #slope is not the floor. it is either a ceiling or a wall.
+					print(rad_to_deg(col.get_angle(i, Vector3.UP)))
+					if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91: #collision is ceiling
+						on_wall = false
+						on_ceiling = true
+						vel.y = -vel.y #bounce off
+					else:
+						on_wall = true
+						on_ceiling = false
 			
 	else:
 		on_floor = false
@@ -183,11 +200,13 @@ func _physics_process(delta):
 		
 	previous_vel = vel
 	previous_dir = dir
-	
+	$UI/pos.text = "pos: {" + var_to_str(position.x) + ", " + var_to_str(position.y) + ", " + var_to_str(position.z) + "}"
 	$UI/velx.text = "vel.x: " + var_to_str(vel.x)
 	$UI/vely.text = "vel.y: " + var_to_str(vel.y)
 	$UI/velz.text = "vel.z: " + var_to_str(vel.z)
 	$UI/velmag.text = "vel mag: " + var_to_str(Vector3(vel.x,0,vel.z).length())
 	$UI/on_floor.text = "on_floor: " + var_to_str(on_floor)
+	$UI/on_wall.text = "on_wall: " + var_to_str(on_wall)
+	$UI/on_ceiling.text = "on_ceiling: " + var_to_str(on_ceiling)
 	
 	
