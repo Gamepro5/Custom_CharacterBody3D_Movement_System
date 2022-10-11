@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://c7cmhu7x06w2c"]
+[gd_scene load_steps=5 format=3 uid="uid://c7cmhu7x06w2c"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_t7smq"]
+[ext_resource type="PackedScene" uid="uid://gotfrvt8wfc" path="res://ui.tscn" id="2_ym6sr"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1js60"]
 
@@ -51,40 +52,6 @@ debug_shape_custom_color = Color(0, 0, 1, 1)
 [node name="MeshInstance3d" type="MeshInstance3D" parent="."]
 mesh = SubResource("CapsuleMesh_56ycl")
 
-[node name="velx" type="Label" parent="."]
-offset_left = 9.0
-offset_top = 9.0
-offset_right = 70.0
-offset_bottom = 35.0
-text = "vel_x
-"
-
-[node name="vely" type="Label" parent="."]
-offset_left = 10.0
-offset_top = 37.0
-offset_right = 71.0
-offset_bottom = 63.0
-text = "vel_y"
-
-[node name="velz" type="Label" parent="."]
-offset_left = 10.0
-offset_top = 66.0
-offset_right = 71.0
-offset_bottom = 92.0
-text = "vel_z"
-
-[node name="on_floor" type="Label" parent="."]
-offset_left = 10.0
-offset_top = 119.0
-offset_right = 74.0
-offset_bottom = 145.0
-text = "on_floor
-"
-
-[node name="velmag" type="Label" parent="."]
-offset_left = 9.0
-offset_top = 93.0
-offset_right = 70.0
-offset_bottom = 119.0
-text = "vel_mag
-"
+[node name="UI" parent="." instance=ExtResource("2_ym6sr")]
+grow_horizontal = 2
+grow_vertical = 2

@@ -1,0 +1,80 @@
+[gd_scene load_steps=2 format=3 uid="uid://gotfrvt8wfc"]
+
+[ext_resource type="Script" path="res://console.gd" id="1_07mal"]
+
+[node name="UI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -10.0
+offset_bottom = -13.0
+
+[node name="velx" type="Label" parent="."]
+layout_mode = 1
+offset_left = 9.0
+offset_top = 9.0
+offset_right = 70.0
+offset_bottom = 35.0
+text = "vel_x
+"
+
+[node name="vely" type="Label" parent="."]
+layout_mode = 1
+offset_left = 10.0
+offset_top = 37.0
+offset_right = 71.0
+offset_bottom = 63.0
+text = "vel_y"
+
+[node name="velz" type="Label" parent="."]
+layout_mode = 1
+offset_left = 10.0
+offset_top = 66.0
+offset_right = 71.0
+offset_bottom = 92.0
+text = "vel_z"
+
+[node name="on_floor" type="Label" parent="."]
+layout_mode = 1
+offset_left = 10.0
+offset_top = 119.0
+offset_right = 74.0
+offset_bottom = 145.0
+text = "on_floor
+"
+
+[node name="velmag" type="Label" parent="."]
+layout_mode = 1
+offset_left = 9.0
+offset_top = 93.0
+offset_right = 70.0
+offset_bottom = 119.0
+text = "vel_mag
+"
+
+[node name="Console" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+offset_left = 2.0
+offset_top = 8.0
+offset_right = 1146.0
+offset_bottom = 642.0
+script = ExtResource("1_07mal")
+
+[node name="Output" type="TextEdit" parent="Console"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 1.0
+offset_right = 1133.0
+offset_bottom = 582.0
+placeholder_text = "console history"
+editable = false
+
+[node name="Input" type="LineEdit" parent="Console"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 590.0
+offset_right = 1133.0
+offset_bottom = 621.0
+placeholder_text = "enter commands here (if you are smart enough to know valid ones lol)"

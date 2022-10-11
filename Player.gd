@@ -2,55 +2,73 @@ extends CharacterBody3D
 
 
 const SPEED = 10
-const JUMP_VELOCITY = 7
+const JUMP_VELOCITY = 5
 var ACCELERATION = 20
 var DECELERATION = 8
 var AIR_ACCELERATION = 1
+var AIR_DECELERATION = 7
 var mouse_axis = Vector2.ZERO
 var vertical
 var horizontal
-var gravity = 15#ProjectSettings.get_setting("physics/3d/default_gravity")
+var gravity = 12
+var dir = Vector3.ZERO
 var vel = Vector3(0,0,0)
 var max_floor_angle = deg_to_rad(65)
 var last_col_normal = Vector3.UP
-@onready var label = $VelocityLabel
-@onready var label2 = $on_floor
 var previous_vel = Vector3.ZERO
-var on_floor = false;
-var on_wall = false;
-var on_ceiling = false;
+var on_floor = false
+var on_wall = false
+var on_ceiling = false
 var impulse_vel = Vector3.ZERO
 var snap_vector = Vector3.UP
-var snap_magnitude = 0.01;
-
+var snap_magnitude = 0.001
+var previous_dir = Vector3.ZERO
+@onready var fps_camera = $Head/Camera
+@onready var tps_camera = $Head/Camera2
+var cached_impulses = []
 
 func _input(event: InputEvent) -> void:
+	
 	if event.is_action_pressed("ui_cancel"):
 		#get_tree().quit() # Quits the game
-		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		elif Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		
-	if event.is_action_pressed("mouse_input"):
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-
-	if event is InputEventMouseMotion:
-		mouse_axis = event.relative
+	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		
-		var horizontal: float = -mouse_axis.x * 0.05
-		var vertical: float = -mouse_axis.y * 0.05
+		if event.is_action_pressed("camera_switch"):
+			if (fps_camera.current == true):
+				tps_camera.current = true
+				fps_camera.current = false
+			else:
+				tps_camera.current = false
+				fps_camera.current = true
 			
-		mouse_axis = Vector2(0,0)
-		rotate_y(deg_to_rad(horizontal))
-		$Head.rotate_x(deg_to_rad(vertical))
-		#print($Head.rotation)
-		$Head.rotation.x = clamp($Head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+		if event is InputEventMouseMotion:
+			mouse_axis = event.relative
+			
+			var horizontal: float = -mouse_axis.x * 0.05
+			var vertical: float = -mouse_axis.y * 0.05
+				
+			mouse_axis = Vector2(0,0)
+			rotate_y(deg_to_rad(horizontal))
+			$Head.rotate_x(deg_to_rad(vertical))
+			#print($Head.rotation)
+			$Head.rotation.x = clamp($Head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
+func apply_impulse(vect: Array):
+	cached_impulses.append(vect)
 
 func _physics_process(delta):
 	
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
-	var input_dir = Input.get_vector("left", "right", "forward", "backward")
-	var dir = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	
+	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		var input_dir = Input.get_vector("left", "right", "forward", "backward")
+		dir = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
 	var temp = vel.y
 	if (on_floor):
@@ -59,7 +77,12 @@ func _physics_process(delta):
 		else:
 			vel = vel.lerp(dir*SPEED, DECELERATION * delta)
 	else:
-		vel = vel.lerp(dir*SPEED, AIR_ACCELERATION * delta)
+		if dir == Vector3.ZERO:
+			dir = previous_dir # so you don't need to hold a movement key to get the max possible distance
+		if (dir.dot(vel) > 0): # makes it easy to stop your trajectory, but if you wish to change, you won't be able to super well. this is similar to tf2.
+			vel = vel.lerp(dir*SPEED, AIR_ACCELERATION * delta)
+		else:
+			vel = vel.lerp(dir*SPEED, AIR_DECELERATION * delta)
 	vel.y = temp
 	
 	if (Vector3(vel.x,0,vel.z).length() < 0.001): #sigfigs!
@@ -81,23 +104,46 @@ func _physics_process(delta):
 	if (snap_vector != Vector3.ZERO): # we don't want to snap if we received an impulse (like jumping)!
 		snap_vector = -last_col_normal * (abs(vel.y)+10) * snap_magnitude
 	
-	if Input.is_action_just_pressed("jump") and on_floor:
-		last_col_normal = Vector3.UP
-		vel.y = JUMP_VELOCITY
-		on_floor = false;
-		snap_vector = Vector3.ZERO
-		
+	if Input.is_action_just_pressed("jump") and on_floor and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		#last_col_normal = Vector3.UP
+		#vel.y = JUMP_VELOCITY
+		#on_floor = false;
+		apply_impulse([[null,JUMP_VELOCITY,null], true]) #apply impulse works such that the first item in the array is the velocity (represented in another array of length 3), and the second item is a boolean for if you desire to set the vel instead of adding to it.
+		#snap_vector = Vector3.ZERO
+	
+	if cached_impulses.size() > 0:
+		for i in cached_impulses:
+			if i[1] == true:
+				if i[0][0] != null:
+					vel.x = i[0][0]
+				if i[0][1] != null:
+					vel.y = i[0][1]
+				if i[0][2] != null:
+					vel.z = i[0][2]
+			else:
+				if i[0][0] != null:
+					vel.x += i[0][0]
+				if i[0][1] != null:
+					vel.y += i[0][1]
+				if i[0][2] != null:
+					vel.z += i[0][2]
+			last_col_normal = Vector3.UP
+			snap_vector = Vector3.ZERO
+		cached_impulses.clear()
+	
 	$snapVector.set_rotation(- $snapVector.get_parent().rotation)
 	$snapVector.target_position = snap_vector;
 	#print(snap_vector)
-	var ground_check = move_and_collide(snap_vector, true)
+	var ground_check
+	if (snap_vector!=Vector3.ZERO):
+		ground_check = move_and_collide(snap_vector, true, 0.001, true)
 	if !ground_check && snap_vector != Vector3.ZERO:
 		ground_check = move_and_collide( Vector3.DOWN * (abs(vel.y)+0.1) * 0.005, true)
 	if ground_check:
 		var normal = ground_check.get_normal()
 		last_col_normal = normal;
 		if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
-			ground_check = move_and_collide(Vector3.DOWN*0.05, true)
+			ground_check = move_and_collide(Vector3.DOWN*0.005, true, 0.001, true)
 			if !ground_check:
 				move_and_collide(Vector3.DOWN*0.5) #snap
 			vel.y = 0;
@@ -136,11 +182,12 @@ func _physics_process(delta):
 	
 		
 	previous_vel = vel
+	previous_dir = dir
 	
-	$velx.text = "vel.x: " + var_to_str(vel.x)
-	$vely.text = "vel.y: " + var_to_str(vel.y)
-	$velz.text = "vel.z: " + var_to_str(vel.z)
-	$velmag.text = "vel mag: " + var_to_str(Vector3(vel.x,0,vel.z).length())
-	label2.text = "on_floor: " + var_to_str(on_floor)
+	$UI/velx.text = "vel.x: " + var_to_str(vel.x)
+	$UI/vely.text = "vel.y: " + var_to_str(vel.y)
+	$UI/velz.text = "vel.z: " + var_to_str(vel.z)
+	$UI/velmag.text = "vel mag: " + var_to_str(Vector3(vel.x,0,vel.z).length())
+	$UI/on_floor.text = "on_floor: " + var_to_str(on_floor)
 	
 	
