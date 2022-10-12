@@ -13,7 +13,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="pos" type="Label" parent="."]
-layout_mode = 1
+layout_mode = 0
 offset_left = 9.0
 offset_top = 9.0
 offset_right = 70.0
@@ -55,7 +55,7 @@ text = "on_floor
 "
 
 [node name="on_wall" type="Label" parent="."]
-layout_mode = 1
+layout_mode = 0
 offset_left = 6.0
 offset_top = 172.0
 offset_right = 70.0
@@ -65,7 +65,7 @@ text = "on_wall
 "
 
 [node name="on_ceiling" type="Label" parent="."]
-layout_mode = 1
+layout_mode = 0
 offset_left = 7.0
 offset_top = 195.0
 offset_right = 84.0
@@ -108,4 +108,4 @@ offset_left = 8.0
 offset_top = 590.0
 offset_right = 1133.0
 offset_bottom = 621.0
-placeholder_text = "enter commands here (if you are smart enough to know valid ones lol)"
+placeholder_text = "Enter \"help\" for a list of convars"

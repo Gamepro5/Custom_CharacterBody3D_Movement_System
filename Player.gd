@@ -1,8 +1,8 @@
 extends CharacterBody3D
 
 
-const SPEED = 10
-const JUMP_VELOCITY = 5
+var SPEED = 10
+var JUMP_VELOCITY = 15
 var ACCELERATION = 20
 var DECELERATION = 8
 var AIR_ACCELERATION = 1
@@ -28,24 +28,9 @@ var previous_dir = Vector3.ZERO
 var cached_impulses = []
 
 func _input(event: InputEvent) -> void:
-	
-	if event.is_action_pressed("ui_cancel"):
-		#get_tree().quit() # Quits the game
-		if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
-			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-		elif Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		
 	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		
-		if event.is_action_pressed("camera_switch"):
-			if (fps_camera.current == true):
-				tps_camera.current = true
-				fps_camera.current = false
-			else:
-				tps_camera.current = false
-				fps_camera.current = true
-			
 		if event is InputEventMouseMotion:
 			mouse_axis = event.relative
 			
@@ -106,8 +91,9 @@ func _physics_process(delta):
 	#(0.01+vel.length()*delta)
 	#var snap_vector = Vector3.DOWN*(rad_to_deg(last_col_normal.angle_to(Vector3.UP))+1)*10
 	if (snap_vector != Vector3.ZERO): # we don't want to snap if we received an impulse (like jumping)!
-		snap_vector = -last_col_normal * (abs(vel.y)+10) * snap_magnitude
-	
+		#snap_vector = -last_col_normal * (abs(vel.y)+10) * snap_magnitude
+		snap_vector = Vector3.DOWN * (vel.length()+10) * snap_magnitude
+		
 	if Input.is_action_just_pressed("jump") and on_floor and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		#last_col_normal = Vector3.UP
 		#vel.y = JUMP_VELOCITY
@@ -140,7 +126,7 @@ func _physics_process(delta):
 	#print(snap_vector)
 	var ground_check
 	if (snap_vector!=Vector3.ZERO): # snap vector is only unset from zero in the "in air" part of this code, where a collision would set it to Vector3.DOWN
-		ground_check = move_and_collide(snap_vector, true, 0.001, true)
+		ground_check = move_and_collide(snap_vector, true, 0.001, true, 10)
 	if !ground_check && snap_vector != Vector3.ZERO:
 		ground_check = move_and_collide( Vector3.DOWN * (abs(vel.y)+0.1) * 0.005, true) #this is here to snap down if you just climbed a slope that is so steep that you would otherwise go flying.
 	if ground_check:
@@ -149,7 +135,7 @@ func _physics_process(delta):
 		for i in range(ground_check.get_collision_count()): #there may be several collisions 
 			normal = ground_check.get_normal(i)
 			if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
-				var ground_check2 = move_and_collide(Vector3.DOWN*0.005, true, 0.001, true) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector.
+				var ground_check2 = move_and_collide(Vector3.DOWN*0.005, true, 0.001, true, 10) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector.
 				if !ground_check2:
 					move_and_collide(Vector3.DOWN*0.5) #snap
 				vel.y = 0;
@@ -158,11 +144,15 @@ func _physics_process(delta):
 				vel.y = (-normal.z*vel.z-normal.x*vel.x)/normal.y
 				if (normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
 					vel.y = 0
+			else:
+				if !on_floor:
+					vel.y -= gravity * delta
 		### this may need to be done recursively
-		var col = move_and_collide(vel*delta) #actually move!
+		var col = move_and_collide(vel*delta, false, 0.001, false, 10) #actually move!
 		if col:
 			normal = col.get_normal()
 			last_col_normal = normal;
+			
 			for i in range(col.get_collision_count()):
 				normal = col.get_normal(i)
 				if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
@@ -179,24 +169,26 @@ func _physics_process(delta):
 				else: #slope is not the floor. it is either a ceiling or a wall.
 					print(rad_to_deg(col.get_angle(i, Vector3.UP)))
 					if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91: #collision is ceiling
-						on_wall = false
 						on_ceiling = true
-						vel.y = -vel.y #bounce off
 					else:
 						on_wall = true
-						on_ceiling = false
+						vel = vel - ((vel.dot(normal))/normal.length()) * normal
 			
 	else:
 		on_floor = false
-		#print(last_col_normal, "  ", previous_vel.y)
-		if (last_col_normal == Vector3(0,1,0) && floor(previous_vel.y) == 0 && snap_vector != Vector3.ZERO):
-			printerr("ERROR! Godot Collision Engine most likely reported a false negative just now. Snap Vector is: ", snap_vector)
 		vel.y -= gravity * delta
-		var col = move_and_collide(vel*delta)
+		var col = move_and_collide(vel*delta, false, 0.001, false, 10)
 		if col:
 			last_col_normal = col.get_normal()
-			snap_vector = -last_col_normal * (abs(vel.y)+1) * snap_magnitude
-	
+			var normal = col.get_normal()
+			for i in range(col.get_collision_count()):
+				normal = col.get_normal(i)
+				if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91:
+					vel.y = 0;
+				elif (normal.angle_to(Vector3.UP) <= max_floor_angle):
+					snap_vector = -last_col_normal * (abs(vel.y)+1) * snap_magnitude
+				else:
+					vel = vel - ((vel.dot(normal))/normal.length()) * normal
 		
 	previous_vel = vel
 	previous_dir = dir
