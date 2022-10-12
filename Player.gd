@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 
 var SPEED = 10
-var JUMP_VELOCITY = 15
+var JUMP_VELOCITY = 7
 var ACCELERATION = 20
 var DECELERATION = 8
 var AIR_ACCELERATION = 1
@@ -123,7 +123,7 @@ func _physics_process(delta):
 	
 	$snapVector.set_rotation(- $snapVector.get_parent().rotation)
 	$snapVector.target_position = snap_vector;
-	#print(snap_vector)
+	
 	var ground_check
 	if (snap_vector!=Vector3.ZERO): # snap vector is only unset from zero in the "in air" part of this code, where a collision would set it to Vector3.DOWN
 		ground_check = move_and_collide(snap_vector, true, 0.001, true, 10)
@@ -132,6 +132,8 @@ func _physics_process(delta):
 	if ground_check:
 		var normal = ground_check.get_normal()
 		last_col_normal = normal;
+		var wall_collision_normal = Vector3.ZERO
+		var ceiling_collision_normal = Vector3.ZERO
 		for i in range(ground_check.get_collision_count()): #there may be several collisions 
 			normal = ground_check.get_normal(i)
 			if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
@@ -140,40 +142,47 @@ func _physics_process(delta):
 					move_and_collide(Vector3.DOWN*0.5) #snap
 				vel.y = 0;
 				on_floor = true
-				on_ceiling = false #temporary, not nessesarily true
 				vel.y = (-normal.z*vel.z-normal.x*vel.x)/normal.y
 				if (normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
 					vel.y = 0
-			else:
-				if !on_floor:
-					vel.y -= gravity * delta
+			else: #collision is wall
+				#wall_collision_normal = normal
+				pass
 		### this may need to be done recursively
 		var col = move_and_collide(vel*delta, false, 0.001, false, 10) #actually move!
 		if col:
 			normal = col.get_normal()
 			last_col_normal = normal;
-			
 			for i in range(col.get_collision_count()):
 				normal = col.get_normal(i)
 				if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
 					on_floor = true
-					
-					on_wall = false #temporary, not nessesarily true
-					on_ceiling = false #temporary, not nessesarily true
-					
 					vel.y = (-normal.z*vel.z-normal.x*vel.x)/normal.y
 					if (normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
 						vel.y = 0
 					move_and_collide(vel*delta) #move the remainder of the distnace up the slope
 			###
-				else: #slope is not the floor. it is either a ceiling or a wall.
-					print(rad_to_deg(col.get_angle(i, Vector3.UP)))
+				else: #collision is not the floor. it is either a ceiling or a wall.
 					if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91: #collision is ceiling
-						on_ceiling = true
+						ceiling_collision_normal = normal
 					else:
-						on_wall = true
-						vel = vel - ((vel.dot(normal))/normal.length()) * normal
-			
+						wall_collision_normal = normal
+						#vel = vel - ((vel.dot(normal))/normal.length()) * normal
+		if (wall_collision_normal != Vector3.ZERO):
+			on_wall = true
+			vel = vel - ((vel.dot(wall_collision_normal))/wall_collision_normal.length()) * wall_collision_normal
+			if vel.y > 0:
+				vel.y = 0
+		else:
+			on_wall = false
+			wall_collision_normal = Vector3.ZERO
+		if (ceiling_collision_normal != Vector3.ZERO):
+			on_ceiling = true
+			vel.x = (vel - ((vel.dot(ceiling_collision_normal))/ceiling_collision_normal.length()) * ceiling_collision_normal).z
+			vel.z = (vel - ((vel.dot(ceiling_collision_normal))/ceiling_collision_normal.length()) * ceiling_collision_normal).z
+		else:
+			on_ceiling = false
+			ceiling_collision_normal = Vector3.ZERO
 	else:
 		on_floor = false
 		vel.y -= gravity * delta
@@ -184,7 +193,7 @@ func _physics_process(delta):
 			for i in range(col.get_collision_count()):
 				normal = col.get_normal(i)
 				if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91:
-					vel.y = 0;
+					vel = vel - ((vel.dot(normal))/normal.length()) * normal
 				elif (normal.angle_to(Vector3.UP) <= max_floor_angle):
 					snap_vector = -last_col_normal * (abs(vel.y)+1) * snap_magnitude
 				else:
