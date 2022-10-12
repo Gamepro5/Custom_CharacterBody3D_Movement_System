@@ -126,7 +126,7 @@ func _physics_process(delta):
 	
 	var ground_check
 	if (snap_vector!=Vector3.ZERO): # snap vector is only unset from zero in the "in air" part of this code, where a collision would set it to Vector3.DOWN
-		ground_check = move_and_collide(snap_vector, true, 0.001, true, 10)
+		ground_check = move_and_collide(snap_vector, true, 0.001, true, 3)
 	if !ground_check && snap_vector != Vector3.ZERO:
 		ground_check = move_and_collide( Vector3.DOWN * (abs(vel.y)+0.1) * 0.005, true) #this is here to snap down if you just climbed a slope that is so steep that you would otherwise go flying.
 	if ground_check:
@@ -149,7 +149,7 @@ func _physics_process(delta):
 				#wall_collision_normal = normal
 				pass
 		### this may need to be done recursively
-		var col = move_and_collide(vel*delta, false, 0.001, false, 10) #actually move!
+		var col = move_and_collide(vel*delta, false, 0.001, false, 3) #actually move!
 		if col:
 			normal = col.get_normal()
 			last_col_normal = normal;
@@ -168,11 +168,13 @@ func _physics_process(delta):
 					else:
 						wall_collision_normal = normal
 						#vel = vel - ((vel.dot(normal))/normal.length()) * normal
+		
 		if (wall_collision_normal != Vector3.ZERO):
 			on_wall = true
 			vel = vel - ((vel.dot(wall_collision_normal))/wall_collision_normal.length()) * wall_collision_normal
 			if vel.y > 0:
 				vel.y = 0
+			move_and_collide(vel*delta)#move the remainder of the distance along the wall
 		else:
 			on_wall = false
 			wall_collision_normal = Vector3.ZERO
@@ -180,23 +182,25 @@ func _physics_process(delta):
 			on_ceiling = true
 			vel.x = (vel - ((vel.dot(ceiling_collision_normal))/ceiling_collision_normal.length()) * ceiling_collision_normal).z
 			vel.z = (vel - ((vel.dot(ceiling_collision_normal))/ceiling_collision_normal.length()) * ceiling_collision_normal).z
+			move_and_collide(vel*delta)#move the remainder of the distance along the wall
 		else:
 			on_ceiling = false
 			ceiling_collision_normal = Vector3.ZERO
 	else:
 		on_floor = false
 		vel.y -= gravity * delta
-		var col = move_and_collide(vel*delta, false, 0.001, false, 10)
+		var col = move_and_collide(vel*delta, false, 0.001, false, 3)
 		if col:
 			last_col_normal = col.get_normal()
 			var normal = col.get_normal()
 			for i in range(col.get_collision_count()):
 				normal = col.get_normal(i)
-				if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91:
+				if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91:#ceiling
 					vel = vel - ((vel.dot(normal))/normal.length()) * normal
-				elif (normal.angle_to(Vector3.UP) <= max_floor_angle):
+				elif (normal.angle_to(Vector3.UP) <= max_floor_angle):#floor
 					snap_vector = -last_col_normal * (abs(vel.y)+1) * snap_magnitude
-				else:
+				else:#wall
+					on_wall = true
 					vel = vel - ((vel.dot(normal))/normal.length()) * normal
 		
 	previous_vel = vel
