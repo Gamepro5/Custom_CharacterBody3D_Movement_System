@@ -1,27 +1,39 @@
-[gd_scene load_steps=5 format=3 uid="uid://c7cmhu7x06w2c"]
+[gd_scene load_steps=8 format=3 uid="uid://c7cmhu7x06w2c"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_t7smq"]
+[ext_resource type="Texture2D" uid="uid://crfvfprsa42gu" path="res://addons/kenney_prototype_textures/orange/texture_01.png" id="2_nlsq8"]
 [ext_resource type="PackedScene" uid="uid://gotfrvt8wfc" path="res://ui.tscn" id="2_ym6sr"]
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_8joga"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_w3x3o"]
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_jxfiu"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ncj06"]
+albedo_texture = ExtResource("2_nlsq8")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_llxhl"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_mw2cj"]
+material = SubResource("StandardMaterial3D_llxhl")
 
 [node name="CharacterBody3d" type="CharacterBody3D"]
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
 floor_snap_length = 0.0
 script = ExtResource("1_t7smq")
 
 [node name="CollisionShape3d" type="CollisionShape3D" parent="."]
-shape = SubResource("CylinderShape3D_8joga")
+shape = SubResource("CylinderShape3D_w3x3o")
 
-[node name="Head" type="Node3D" parent="."]
+[node name="Torso" type="Node3D" parent="."]
+
+[node name="Head" type="Node3D" parent="Torso"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.567, 0)
 
-[node name="Camera" type="Camera3D" parent="Head"]
+[node name="Camera" type="Camera3D" parent="Torso/Head"]
 current = true
 fov = 90.0
 
-[node name="Camera2" type="Camera3D" parent="Head"]
+[node name="Camera2" type="Camera3D" parent="Torso/Head"]
 transform = Transform3D(1, 0, 0, 0, 0.940371, 0.34015, 0, -0.34015, 0.940371, 0, 2.53898, 3.67285)
 fov = 90.0
 
@@ -51,6 +63,7 @@ collide_with_bodies = false
 debug_shape_custom_color = Color(0, 0, 1, 1)
 
 [node name="MeshInstance3d" type="MeshInstance3D" parent="."]
-mesh = SubResource("CylinderMesh_jxfiu")
+material_override = SubResource("StandardMaterial3D_ncj06")
+mesh = SubResource("CylinderMesh_mw2cj")
 
 [node name="UI" parent="." instance=ExtResource("2_ym6sr")]

@@ -21,10 +21,10 @@ var on_wall = false
 var on_ceiling = false
 var impulse_vel = Vector3.ZERO
 var snap_vector = Vector3.UP
-var snap_magnitude = 0.001
+var snap_magnitude = 0.01
 var previous_dir = Vector3.ZERO
-@onready var fps_camera = $Head/Camera
-@onready var tps_camera = $Head/Camera2
+@onready var fps_camera = $Torso/Head/Camera
+@onready var tps_camera = $Torso/Head/Camera2
 var cached_impulses = []
 
 func _input(event: InputEvent) -> void:
@@ -38,10 +38,10 @@ func _input(event: InputEvent) -> void:
 			var vertical: float = -mouse_axis.y * 0.05
 				
 			mouse_axis = Vector2(0,0)
-			rotate_y(deg_to_rad(horizontal))
-			$Head.rotate_x(deg_to_rad(vertical))
+			$Torso.rotate_y(deg_to_rad(horizontal)) #we want to NOT rotate the character body (hence the torso spacial node). This helps the sensnsitve engine with accuracy it seems.
+			$Torso/Head.rotate_x(deg_to_rad(vertical))
 			#print($Head.rotation)
-			$Head.rotation.x = clamp($Head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+			$Torso/Head.rotation.x = clamp($Torso/Head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
 func apply_impulse(vect: Array):
 	cached_impulses.append(vect)
@@ -57,7 +57,7 @@ func _physics_process(delta):
 	
 	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		var input_dir = Input.get_vector("left", "right", "forward", "backward")
-		dir = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+		dir = ($Torso.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
 	var temp = vel.y
 	if (on_floor):
@@ -92,7 +92,7 @@ func _physics_process(delta):
 	#var snap_vector = Vector3.DOWN*(rad_to_deg(last_col_normal.angle_to(Vector3.UP))+1)*10
 	if (snap_vector != Vector3.ZERO): # we don't want to snap if we received an impulse (like jumping)!
 		#snap_vector = -last_col_normal * (abs(vel.y)+10) * snap_magnitude
-		snap_vector = Vector3.DOWN * (vel.length()+10) * snap_magnitude
+		snap_vector = Vector3.DOWN * (abs(vel.y)+10) * snap_magnitude
 		
 	if Input.is_action_just_pressed("jump") and on_floor and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		#last_col_normal = Vector3.UP
@@ -124,11 +124,11 @@ func _physics_process(delta):
 	$snapVector.set_rotation(- $snapVector.get_parent().rotation)
 	$snapVector.target_position = snap_vector;
 	
-	var ground_check
+	var ground_check = null
 	if (snap_vector!=Vector3.ZERO): # snap vector is only unset from zero in the "in air" part of this code, where a collision would set it to Vector3.DOWN
 		ground_check = move_and_collide(snap_vector, true, 0.001, true, 3)
-	if !ground_check && snap_vector != Vector3.ZERO:
-		ground_check = move_and_collide( Vector3.DOWN * (abs(vel.y)+0.1) * 0.005, true) #this is here to snap down if you just climbed a slope that is so steep that you would otherwise go flying.
+	#if !ground_check && snap_vector != Vector3.ZERO:
+		#ground_check = move_and_collide( Vector3.DOWN * (abs(vel.y)+0.1) * 0.005, true) #this is here to snap down if you just climbed a slope that is so steep that you would otherwise go flying.
 	if ground_check:
 		var normal = ground_check.get_normal()
 		last_col_normal = normal;
@@ -149,7 +149,7 @@ func _physics_process(delta):
 				#wall_collision_normal = normal
 				pass
 		### this may need to be done recursively
-		var col = move_and_collide(vel*delta, false, 0.001, false, 3) #actually move!
+		var col = move_and_collide(vel*delta, true, 0.001, true, 3) #actually move!
 		if col:
 			normal = col.get_normal()
 			last_col_normal = normal;
@@ -160,7 +160,7 @@ func _physics_process(delta):
 					vel.y = (-normal.z*vel.z-normal.x*vel.x)/normal.y
 					if (normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
 						vel.y = 0
-					move_and_collide(vel*delta) #move the remainder of the distnace up the slope
+					#move_and_collide(vel*delta) #move the remainder of the distnace up the slope
 			###
 				else: #collision is not the floor. it is either a ceiling or a wall.
 					if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91: #collision is ceiling
@@ -174,22 +174,21 @@ func _physics_process(delta):
 			vel = vel - ((vel.dot(wall_collision_normal))/wall_collision_normal.length()) * wall_collision_normal
 			if vel.y > 0:
 				vel.y = 0
-			move_and_collide(vel*delta)#move the remainder of the distance along the wall
+			#move_and_collide(vel*delta)#move the remainder of the distance along the wall
 		else:
 			on_wall = false
-			wall_collision_normal = Vector3.ZERO
 		if (ceiling_collision_normal != Vector3.ZERO):
 			on_ceiling = true
-			vel.x = (vel - ((vel.dot(ceiling_collision_normal))/ceiling_collision_normal.length()) * ceiling_collision_normal).z
-			vel.z = (vel - ((vel.dot(ceiling_collision_normal))/ceiling_collision_normal.length()) * ceiling_collision_normal).z
-			move_and_collide(vel*delta)#move the remainder of the distance along the wall
+			if !on_floor: #TEMPORARY!!!!!!!
+				vel.x = (vel - ((vel.dot(ceiling_collision_normal))/ceiling_collision_normal.length()) * ceiling_collision_normal).z
+				vel.z = (vel - ((vel.dot(ceiling_collision_normal))/ceiling_collision_normal.length()) * ceiling_collision_normal).z
+			#move_and_collide(vel*delta)#move the remainder of the distance along the wall
 		else:
 			on_ceiling = false
-			ceiling_collision_normal = Vector3.ZERO
 	else:
 		on_floor = false
 		vel.y -= gravity * delta
-		var col = move_and_collide(vel*delta, false, 0.001, false, 3)
+		var col = move_and_collide(vel*delta, true, 0.001, true, 3)
 		if col:
 			last_col_normal = col.get_normal()
 			var normal = col.get_normal()
@@ -198,10 +197,12 @@ func _physics_process(delta):
 				if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91:#ceiling
 					vel = vel - ((vel.dot(normal))/normal.length()) * normal
 				elif (normal.angle_to(Vector3.UP) <= max_floor_angle):#floor
-					snap_vector = -last_col_normal * (abs(vel.y)+1) * snap_magnitude
+					snap_vector = Vector3.DOWN * (abs(vel.y)+10) * snap_magnitude
 				else:#wall
 					on_wall = true
 					vel = vel - ((vel.dot(normal))/normal.length()) * normal
+					
+	move_and_collide(vel*delta) #once all calculations are complete, we only move ONCE. If all went well, we should not collide C:
 		
 	previous_vel = vel
 	previous_dir = dir

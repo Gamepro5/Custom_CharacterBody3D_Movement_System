@@ -39,16 +39,16 @@ func cl_set_pos(params):
 	player.position.z = str_to_var(params[2])
 
 func thirdperson(params):
-	player.get_node("Head").get_node("Camera2").set_current(true)
-	player.get_node("Head").get_node("Camera").set_current(false)
+	player.get_node("Torso").get_node("Head").get_node("Camera2").set_current(true)
+	player.get_node("Torso").get_node("Head").get_node("Camera").set_current(false)
 	
 func firstperson(params):
-	player.get_node("Head").get_node("Camera2").set_current(false)
-	player.get_node("Head").get_node("Camera").set_current(true)
+	player.get_node("Torso").get_node("Head").get_node("Camera2").set_current(false)
+	player.get_node("Torso").get_node("Head").get_node("Camera").set_current(true)
 
 func fov_desired(params):
-	player.get_node("Head").get_node("Camera2").set_fov(str_to_var(params[0]))
-	player.get_node("Head").get_node("Camera").set_fov(str_to_var(params[0]))
+	player.get_node("Torso").get_node("Head").get_node("Camera2").set_fov(str_to_var(params[0]))
+	player.get_node("Torso").get_node("Head").get_node("Camera").set_fov(str_to_var(params[0]))
 
 func host_timescale(params):
 	Engine.set_time_scale(str_to_var(params[0]))
