@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://c5at6ttjo0n2a"]
+[gd_scene load_steps=20 format=3 uid="uid://c5at6ttjo0n2a"]
 
 [ext_resource type="Texture2D" uid="uid://buc2n0dftqr2j" path="res://addons/kenney_prototype_textures/green/texture_13.png" id="1_4f8ue"]
 [ext_resource type="PackedScene" uid="uid://cc1kech0pf0vu" path="res://pill.tscn" id="1_bf10i"]
@@ -27,7 +27,9 @@ rim = 0.5
 anisotropy = 0.95
 ao_light_affect = 0.23
 uv1_triplanar = true
+uv1_world_triplanar = true
 uv2_triplanar = true
+uv2_world_triplanar = true
 
 [sub_resource type="BoxMesh" id="BoxMesh_1l8l2"]
 material = SubResource("StandardMaterial3D_ygpub")
@@ -37,7 +39,10 @@ material = SubResource("StandardMaterial3D_ygpub")
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k0t2t"]
 albedo_texture = ExtResource("3_25g1s")
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r87f5"]
+
 [sub_resource type="SphereMesh" id="SphereMesh_3l68c"]
+material = SubResource("StandardMaterial3D_r87f5")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6fqvo"]
 albedo_texture = ExtResource("3_25g1s")
@@ -46,6 +51,9 @@ albedo_texture = ExtResource("3_25g1s")
 bounce = 1.0
 
 [node name="World" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.60279, -0.327306, 0.727678, 0, 0.911991, 0.41021, -0.7979, -0.24727, 0.54974, 26.7637, 20.5024, 23.9932)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_a67um")
@@ -112,12 +120,13 @@ shape = SubResource("BoxShape3D_4gg8d")
 mesh = SubResource("BoxMesh_1l8l2")
 
 [node name="StaticBody3d8" type="StaticBody3D" parent="."]
-transform = Transform3D(7.10538, 0.0303332, 4.13804, 0, 0.128118, -6.16174, -3.08951, 0.0697616, 9.51684, 16.2315, 0, 8.624)
+transform = Transform3D(7.46193, 0.02048, 2.79387, 9.20746e-08, 0.128118, -6.16174, -2.08594, 0.0732622, 9.99439, 16.2315, 0, 8.624)
 
 [node name="CollisionShape3d" type="CollisionShape3D" parent="StaticBody3d8"]
 shape = SubResource("BoxShape3D_4gg8d")
 
 [node name="MeshInstance3d" type="MeshInstance3D" parent="StaticBody3d8"]
+transform = Transform3D(1, 2.32831e-10, 0, 9.53674e-07, 1, -1.90735e-06, 0, 0, 1, 0, 0, 0)
 mesh = SubResource("BoxMesh_1l8l2")
 
 [node name="StaticBody3d3" type="StaticBody3D" parent="."]
@@ -144,11 +153,9 @@ mesh = SubResource("BoxMesh_1l8l2")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.59429, 2.68534, 6.42364)
 physics_material_override = SubResource("PhysicsMaterial_qxbu6")
 
-[node name="CharacterBody3d" parent="." instance=ExtResource("2_bfp1n")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.27512, 6.76085, 1.28223)
-
 [node name="Platform" type="AnimatableBody3D" parent="."]
 transform = Transform3D(5.124, 0, 0, 0, 0.308, 0, 0, 0, 5.124, -4.64257, 0.399272, 15.5248)
+sync_to_physics = false
 script = ExtResource("3_5k2xj")
 
 [node name="CollisionShape3d" type="CollisionShape3D" parent="Platform"]
@@ -156,3 +163,6 @@ shape = SubResource("BoxShape3D_4gg8d")
 
 [node name="MeshInstance3d" type="MeshInstance3D" parent="Platform"]
 mesh = SubResource("BoxMesh_1l8l2")
+
+[node name="KinematicController" parent="." instance=ExtResource("2_bfp1n")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.42412, 6.5268)

@@ -19,7 +19,8 @@ const convars = [
 	["firstperson", []],
 	["fov_desired", [ARG_INT]],
 	["host_timescale", [ARG_FLOAT]],
-	["fullscreen", []]
+	["fullscreen", []],
+	["noclip",[]]
 ]
 func help(params):
 	output.text += "Here is a list of all convars. (Documentation not included because I'm lazy):\n"
@@ -39,16 +40,16 @@ func cl_set_pos(params):
 	player.position.z = str_to_var(params[2])
 
 func thirdperson(params):
-	player.get_node("Torso").get_node("Head").get_node("Camera2").set_current(true)
-	player.get_node("Torso").get_node("Head").get_node("Camera").set_current(false)
+	player.get_node("Head").get_node("Thirdperson").set_current(true)
+	player.get_node("Head").get_node("Firstperson").set_current(false)
 	
 func firstperson(params):
-	player.get_node("Torso").get_node("Head").get_node("Camera2").set_current(false)
-	player.get_node("Torso").get_node("Head").get_node("Camera").set_current(true)
+	player.get_node("Head").get_node("Thirdperson").set_current(false)
+	player.get_node("Head").get_node("Firstperson").set_current(true)
 
 func fov_desired(params):
-	player.get_node("Torso").get_node("Head").get_node("Camera2").set_fov(str_to_var(params[0]))
-	player.get_node("Torso").get_node("Head").get_node("Camera").set_fov(str_to_var(params[0]))
+	player.get_node("Head").get_node("Thirdperson").set_fov(str_to_var(params[0]))
+	player.get_node("Head").get_node("Firstperson").set_fov(str_to_var(params[0]))
 
 func host_timescale(params):
 	Engine.set_time_scale(str_to_var(params[0]))
@@ -58,6 +59,10 @@ func fullscreen(params):
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		
+func noclip(params):
+	player.get_node("CollisionHull").disabled = !player.get_node("CollisionHull").disabled
+	player.noclip = !player.noclip
 
 func evaluate_input(input:String):
 	

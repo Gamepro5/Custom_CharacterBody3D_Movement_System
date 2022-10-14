@@ -1,16 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://gotfrvt8wfc"]
+[gd_scene load_steps=4 format=3 uid="uid://gotfrvt8wfc"]
 
+[ext_resource type="Script" path="res://ui.gd" id="1_3tlut"]
 [ext_resource type="Script" path="res://console.gd" id="1_07mal"]
+[ext_resource type="Texture2D" uid="uid://bcg0gb01cpb5y" path="res://crosshair.png" id="3_7un83"]
 
 [node name="UI" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = -10.0
-offset_bottom = -13.0
+offset_right = -1152.0
+offset_bottom = -648.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_3tlut")
 
 [node name="pos" type="Label" parent="."]
 offset_left = 9.0
@@ -99,3 +102,10 @@ offset_top = 590.0
 offset_right = 1133.0
 offset_bottom = 621.0
 placeholder_text = "Enter \"help\" for a list of convars"
+
+[node name="Crosshair" type="Sprite2D" parent="."]
+position = Vector2(24.5, 64.5)
+scale = Vector2(0.0396959, 0.0396959)
+texture = ExtResource("3_7un83")
+
+[connection signal="resized" from="." to="." method="_on_ui_resized"]
