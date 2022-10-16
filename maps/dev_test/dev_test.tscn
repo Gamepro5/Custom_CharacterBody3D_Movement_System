@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://c5at6ttjo0n2a"]
+[gd_scene load_steps=14 format=3 uid="uid://c5at6ttjo0n2a"]
 
 [ext_resource type="Texture2D" uid="uid://gw86rlg3mld1" path="res://gp5_avatar.png" id="1_4py1n"]
 [ext_resource type="PackedScene" uid="uid://cc1kech0pf0vu" path="res://pill.tscn" id="1_bf10i"]
@@ -28,6 +28,9 @@ sky_material = SubResource("ProceduralSkyMaterial_7pjn8")
 [sub_resource type="Environment" id="Environment_hd7sj"]
 background_mode = 2
 sky = SubResource("Sky_4qr0s")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sbndg"]
+albedo_texture = ExtResource("1_4py1n")
 
 [node name="World" type="Node3D"]
 
@@ -118,3 +121,12 @@ mesh = SubResource("BoxMesh_1l8l2")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_hd7sj")
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.4087, 3.81, 33.5839)
+use_collision = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 0.774216, -0.632922, 0, 0.632922, 0.774216, -0.239594, -5.78627, -3.35122)
+size = Vector3(23.6045, 28.5502, 0.002)
+material = SubResource("StandardMaterial3D_sbndg")
