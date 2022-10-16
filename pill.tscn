@@ -1,11 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://cc1kech0pf0vu"]
-
-[ext_resource type="Texture2D" uid="uid://dhus4lkj8fvlk" path="res://addons/kenney_prototype_textures/red/texture_01.png" id="1_3dah4"]
+[gd_scene load_steps=3 format=3 uid="uid://cc1kech0pf0vu"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_kdv7a"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n0vq6"]
-albedo_texture = ExtResource("1_3dah4")
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_xjl04"]
 
@@ -16,5 +11,4 @@ linear_velocity = Vector3(1, 0, 0)
 shape = SubResource("CapsuleShape3D_kdv7a")
 
 [node name="MeshInstance3d" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_n0vq6")
 mesh = SubResource("CapsuleMesh_xjl04")

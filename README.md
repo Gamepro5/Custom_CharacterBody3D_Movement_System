@@ -2,5 +2,6 @@
 A fully custom made replacement for Godot 4's broken and useless "move_and_slide()" function.
 
 To-do:
-- Handle Ceiling+Slope collision exceptions
-- Collisions with moving bodies (low priority)
+- Better snapping?
+- Write a bug report for Godot because move_and_collide() is reporting false negatives on flat ground.
+- Fix bugs

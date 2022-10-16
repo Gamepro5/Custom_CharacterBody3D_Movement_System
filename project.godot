@@ -75,7 +75,7 @@ console_submit={
 [physics]
 
 3d/run_on_separate_thread=true
-common/physics_ticks_per_second=500
+common/physics_ticks_per_second=240
 
 [rendering]
 

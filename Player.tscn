@@ -1,32 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://c7cmhu7x06w2c"]
+[gd_scene load_steps=4 format=3 uid="uid://c7cmhu7x06w2c"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_t7smq"]
 [ext_resource type="PackedScene" uid="uid://gotfrvt8wfc" path="res://ui.tscn" id="2_ym6sr"]
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_8lbqs"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_lvmt1"]
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_xdbex"]
-height = 0.1
-
-[node name="KinematicController" type="Node3D"]
+[node name="CharacterBody3d" type="CharacterBody3D"]
+floor_snap_length = 0.0
 script = ExtResource("1_t7smq")
 
-[node name="GeneralChecker" type="CharacterBody3D" parent="."]
-top_level = true
-axis_lock_angular_x = true
-axis_lock_angular_y = true
-axis_lock_angular_z = true
-floor_snap_length = 0.0
-
-[node name="CollisionHull" type="CollisionShape3D" parent="GeneralChecker"]
-shape = SubResource("CylinderShape3D_8lbqs")
-
-[node name="GroundChecker" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.95, 0)
-top_level = true
-
-[node name="CollisionHull" type="CollisionShape3D" parent="GroundChecker"]
-shape = SubResource("CylinderShape3D_xdbex")
+[node name="CollisionShape3d" type="CollisionShape3D" parent="."]
+shape = SubResource("CylinderShape3D_lvmt1")
 
 [node name="Velocity" type="RayCast3D" parent="."]
 target_position = Vector3(1, 0, 0)
@@ -53,15 +37,19 @@ collision_mask = 0
 collide_with_bodies = false
 debug_shape_custom_color = Color(0, 0, 1, 1)
 
+[node name="MeshInstance3d" type="MeshInstance3D" parent="."]
+
 [node name="UI" parent="." instance=ExtResource("2_ym6sr")]
 
-[node name="Head" type="Node3D" parent="."]
+[node name="Torso" type="Node3D" parent="."]
+
+[node name="Head" type="Node3D" parent="Torso"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.567, 0)
 
-[node name="Firstperson" type="Camera3D" parent="Head"]
+[node name="FirstPersonCam" type="Camera3D" parent="Torso/Head"]
 current = true
 fov = 90.0
 
-[node name="Thirdperson" type="Camera3D" parent="Head"]
+[node name="ThirdPersonCam" type="Camera3D" parent="Torso/Head"]
 transform = Transform3D(1, 0, 0, 0, 0.940371, 0.34015, 0, -0.34015, 0.940371, 0, 2.53898, 3.67285)
 fov = 90.0
