@@ -1,0 +1,16 @@
+MeshInstance3D
+CollisionShape3D
+StaticBody3D
+CSGBox3D
+Camera3D
+Node3D
+CharacterBody3D
+CSGCombiner3D
+OccluderInstance3D
+DirectionalLight3D
+WorldEnvironment
+RayCast3D
+LineEdit
+TextEdit
+Control
+Label

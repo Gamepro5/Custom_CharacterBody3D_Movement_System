@@ -1,68 +1,43 @@
-[gd_scene load_steps=7 format=3 uid="uid://c7cmhu7x06w2c"]
+[gd_scene load_steps=5 format=3 uid="uid://cu5nrxyw4e38c"]
 
-[ext_resource type="Script" path="res://Player.gd" id="1_t7smq"]
-[ext_resource type="Texture2D" uid="uid://gw86rlg3mld1" path="res://gp5_avatar.png" id="2_8husm"]
-[ext_resource type="PackedScene" uid="uid://gotfrvt8wfc" path="res://ui.tscn" id="2_ym6sr"]
+[ext_resource type="Script" path="res://Player.gd" id="1_p4rr7"]
+[ext_resource type="PackedScene" uid="uid://fxecspr3asp1" path="res://ui.tscn" id="2_hkjrl"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_sim24"]
-size = Vector3(1, 2, 1)
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_sscm0"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p4i6j"]
-albedo_texture = ExtResource("2_8husm")
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_lvijf"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_a7noc"]
-material = SubResource("StandardMaterial3D_p4i6j")
-size = Vector3(1, 2, 1)
-
-[node name="CharacterBody3d" type="CharacterBody3D"]
+[node name="CharacterBody3D" type="CharacterBody3D"]
 axis_lock_angular_x = true
 axis_lock_angular_y = true
 axis_lock_angular_z = true
-floor_snap_length = 0.0
-script = ExtResource("1_t7smq")
+script = ExtResource("1_p4rr7")
 
-[node name="CollisionShape3d" type="CollisionShape3D" parent="."]
-shape = SubResource("BoxShape3D_sim24")
-
-[node name="MeshInstance3d" type="MeshInstance3D" parent="."]
-mesh = SubResource("BoxMesh_a7noc")
-
-[node name="Velocity" type="RayCast3D" parent="."]
-target_position = Vector3(1, 0, 0)
-collision_mask = 0
-collide_with_bodies = false
-debug_shape_custom_color = Color(1, 0, 0, 1)
-
-[node name="snapVector" type="RayCast3D" parent="."]
-target_position = Vector3(1, 0, 0)
-collision_mask = 0
-collide_with_bodies = false
-debug_shape_custom_color = Color(1, 1, 0, 1)
-debug_shape_thickness = 4
-
-[node name="SurfaceNormal" type="RayCast3D" parent="."]
-target_position = Vector3(1, 0, 0)
-collision_mask = 0
-collide_with_bodies = false
-debug_shape_custom_color = Color(0, 1, 0, 1)
-
-[node name="HorizontalVel" type="RayCast3D" parent="."]
-target_position = Vector3(1, 0, 0)
-collision_mask = 0
-collide_with_bodies = false
-debug_shape_custom_color = Color(0, 0, 1, 1)
-
-[node name="UI" parent="." instance=ExtResource("2_ym6sr")]
+[node name="CollisionHull" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_sscm0")
 
 [node name="Torso" type="Node3D" parent="."]
 
 [node name="Head" type="Node3D" parent="Torso"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.567, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.766845, 0)
 
 [node name="FirstPersonCam" type="Camera3D" parent="Torso/Head"]
-fov = 90.0
+current = true
 
 [node name="ThirdPersonCam" type="Camera3D" parent="Torso/Head"]
-transform = Transform3D(1, 0, 0, 0, 0.940371, 0.34015, 0, -0.34015, 0.940371, 0, 2.53898, 3.67285)
-current = true
-fov = 90.0
+transform = Transform3D(1, 0, 0, 0, 0.841294, 0.540578, 0, -0.540578, 0.841294, 0, 5.91603, 7.23098)
+
+[node name="Velocity" type="RayCast3D" parent="."]
+
+[node name="snapVector" type="RayCast3D" parent="."]
+collide_with_bodies = false
+debug_shape_custom_color = Color(1, 0, 0, 1)
+
+[node name="SurfaceNormal" type="RayCast3D" parent="."]
+
+[node name="HorizontalVel" type="RayCast3D" parent="."]
+
+[node name="UI" parent="." instance=ExtResource("2_hkjrl")]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_lvijf")

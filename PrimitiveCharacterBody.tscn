@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://txkwcs4lvpin"]
+
+[ext_resource type="Script" path="res://PrimitiveCharacterBody.gd" id="1_6ul61"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g7pkj"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_mtl3s"]
+
+[node name="CharacterBody3D" type="CharacterBody3D"]
+script = ExtResource("1_6ul61")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_g7pkj")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_mtl3s")
+
+[node name="Head" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+current = true

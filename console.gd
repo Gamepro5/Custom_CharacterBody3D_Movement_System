@@ -19,9 +19,12 @@ const convars = [
 	["firstperson", []],
 	["fov_desired", [ARG_INT]],
 	["host_timescale", [ARG_FLOAT]],
-	["fullscreen", []]
+	["fullscreen", []],
+	["noclip", []],
+	["cl_set_speed", [ARG_FLOAT]],
+	["cl_set_maxjumps", [ARG_FLOAT]]
 ]
-func help(params):
+func help(_params):
 	output.text += "Here is a list of all convars. (Documentation not included because I'm lazy):\n"
 	for i in convars:
 		output.text += "		" + var_to_str(i) + "\n"
@@ -30,7 +33,7 @@ func help(params):
 func cl_apply_impulse(params):
 	player.apply_impulse([ [str_to_var(params[0]), str_to_var(params[1]), str_to_var(params[2])] , str_to_var(params[3]) ])
 
-func quit(params):
+func quit(_params):
 	get_tree().quit() # Quits the game
 	
 func cl_set_pos(params):
@@ -38,11 +41,11 @@ func cl_set_pos(params):
 	player.position.y = str_to_var(params[1])
 	player.position.z = str_to_var(params[2])
 
-func thirdperson(params):
+func thirdperson(_params):
 	player.get_node("Torso").get_node("Head").get_node("ThirdPersonCam").set_current(true)
 	player.get_node("Torso").get_node("Head").get_node("FirstPersonCam").set_current(false)
 	
-func firstperson(params):
+func firstperson(_params):
 	player.get_node("Torso").get_node("Head").get_node("ThirdPersonCam").set_current(false)
 	player.get_node("Torso").get_node("Head").get_node("FirstPersonCam").set_current(true)
 
@@ -50,15 +53,25 @@ func fov_desired(params):
 	player.get_node("Torso").get_node("Head").get_node("ThirdPersonCam").set_fov(str_to_var(params[0]))
 	player.get_node("Torso").get_node("Head").get_node("FirstPersonCam").set_fov(str_to_var(params[0]))
 
-func host_timescale(params):
+func _host_timescale(params):
 	Engine.set_time_scale(str_to_var(params[0]))
 
-func fullscreen(params):
+func fullscreen(_params):
 	if (DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN):
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 
+func noclip(params):
+	player.noclip = !player.noclip
+	player.get_node("CollisionHull").disabled = !player.get_node("CollisionHull").disabled
+
+func cl_set_speed(params):
+	player.SPEED = str_to_var(params[0])
+
+func cl_set_maxjumps(params):
+	player.max_air_jumps = str_to_var(params[0])
+	
 func evaluate_input(input:String):
 	
 	for k in input.split(";"):
