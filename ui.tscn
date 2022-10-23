@@ -14,12 +14,14 @@ grow_vertical = 2
 script = ExtResource("1_jvkcx")
 
 [node name="pos" type="Label" parent="."]
+layout_mode = 0
 offset_left = 3.0
 offset_right = 43.0
 offset_bottom = 26.0
 text = "pos"
 
 [node name="velx" type="Label" parent="."]
+layout_mode = 0
 offset_left = 4.0
 offset_top = 19.0
 offset_right = 44.0
@@ -27,6 +29,7 @@ offset_bottom = 45.0
 text = "velx"
 
 [node name="vely" type="Label" parent="."]
+layout_mode = 0
 offset_left = 4.0
 offset_top = 39.0
 offset_right = 44.0
@@ -34,6 +37,7 @@ offset_bottom = 65.0
 text = "vely"
 
 [node name="velz" type="Label" parent="."]
+layout_mode = 0
 offset_left = 4.0
 offset_top = 64.0
 offset_right = 44.0
@@ -41,6 +45,7 @@ offset_bottom = 90.0
 text = "velz"
 
 [node name="on_floor" type="Label" parent="."]
+layout_mode = 0
 offset_left = 3.0
 offset_top = 106.0
 offset_right = 67.0
@@ -48,6 +53,7 @@ offset_bottom = 132.0
 text = "on_floor"
 
 [node name="on_wall" type="Label" parent="."]
+layout_mode = 0
 offset_left = 5.0
 offset_top = 133.0
 offset_right = 64.0
@@ -55,6 +61,7 @@ offset_bottom = 159.0
 text = "on_wall"
 
 [node name="on_ceiling" type="Label" parent="."]
+layout_mode = 0
 offset_left = 5.0
 offset_top = 162.0
 offset_right = 82.0
@@ -62,6 +69,7 @@ offset_bottom = 188.0
 text = "on_ceiling"
 
 [node name="velmag" type="Label" parent="."]
+layout_mode = 0
 offset_left = 2.0
 offset_top = 84.0
 offset_right = 58.0
@@ -70,19 +78,21 @@ text = "velmag"
 
 [node name="Console" type="Control" parent="."]
 visible = false
-layout_mode = 3
+layout_mode = 1
 anchors_preset = 0
 offset_right = 1152.0
 offset_bottom = 648.0
 script = ExtResource("2_j2twt")
 
 [node name="Output" type="TextEdit" parent="Console"]
+layout_mode = 0
 offset_left = 30.0
 offset_top = 13.0
 offset_right = 1130.0
 offset_bottom = 598.0
 
 [node name="Input" type="LineEdit" parent="Console"]
+layout_mode = 0
 offset_left = 23.0
 offset_top = 606.0
 offset_right = 1130.0

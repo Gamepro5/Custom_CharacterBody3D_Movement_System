@@ -13,7 +13,7 @@ var horizontal
 @export var gravity = 28
 var dir = Vector3.ZERO
 var vel = Vector3(0,0,0)
-var max_floor_angle = deg_to_rad(65)
+@export_range(0, 89, 1) var max_floor_angle = 45
 var last_col_normal = Vector3.UP
 var previous_vel = Vector3.ZERO
 var on_floor = false
@@ -51,9 +51,9 @@ func apply_impulse(vect: Array):
 	cached_impulses.append(vect)
 
 func _physics_process(delta):
+	var max_flr_ang = deg_to_rad(max_floor_angle)
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
-	
 	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		input_dir = Input.get_vector("left", "right", "forward", "backward")
 		if (noclip):
@@ -148,9 +148,7 @@ func _physics_process(delta):
 		var ground_check = null
 		var col_normals = []
 		if (snap_vector!=Vector3.ZERO): # snap vector is only unset from zero in the "in air" part of this code, where a collision would set it to Vector3.DOWN
-			ground_check = move_and_collide(snap_vector, true, 0.001, true, 3)
-		#if !ground_check && snap_vector != Vector3.ZERO:
-			#ground_check = move_and_collide( Vector3.DOWN * (abs(vel.y)+0.1) * 0.005, true) #this is here to snap down if you just climbed a slope that is so steep that you would otherwise go flying.
+			ground_check = move_and_collide(snap_vector, true, 0.1, true, 3)
 		if ground_check:
 			var normal = ground_check.get_normal()
 			last_col_normal = normal;
@@ -161,10 +159,10 @@ func _physics_process(delta):
 			for i in range(ground_check.get_collision_count()): #there may be several collisions 
 				normal = ground_check.get_normal(i)
 				col_normals.push_back(normal)
-				if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
-					var ground_check2 = move_and_collide(Vector3.DOWN*0.005, true, 0.001, true) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector.
+				if (normal.angle_to(Vector3.UP) <= max_flr_ang): #slope counts as the floor
+					var ground_check2 = move_and_collide(Vector3.DOWN*0.005, true, 0.1, true) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector.
 					if !ground_check2:
-						move_and_collide(Vector3.DOWN*0.5,false, 0, true) #snap
+						move_and_collide(Vector3.DOWN*0.5,false, 0.001, true) #snap
 					vel.y = 0;
 					on_floor = true
 					vel.y = (-normal.z*vel.z-normal.x*vel.x)/normal.y
@@ -174,7 +172,7 @@ func _physics_process(delta):
 					#wall_collision_normal = normal
 					pass
 			### this may need to be done recursively
-			var col = move_and_collide(vel*delta, true, 0.001, true, 5)
+			var col = move_and_collide(vel*delta, true, 0.01, true, 5)
 			#if !col:
 				#move_and_collide(vel*delta, false, 0.001, false)
 			if col:
@@ -184,7 +182,7 @@ func _physics_process(delta):
 				for i in range(col.get_collision_count()):
 					normal = col.get_normal(i)
 					col_normals.push_back(normal)
-					if (normal.angle_to(Vector3.UP) <= max_floor_angle): #slope counts as the floor
+					if (normal.angle_to(Vector3.UP) <= max_flr_ang): #slope counts as the floor
 						floor_collision_normal = col.get_normal(i)
 				###
 					else: #collision is not the floor. it is either a ceiling or a wall.
@@ -201,13 +199,13 @@ func _physics_process(delta):
 				air_jumps = max_air_jumps
 			if (wall_collision_normal != Vector3.ZERO):
 				on_wall = true
-				if dir.dot(wall_collision_normal) < 0:
-					vel = previous_vel
+				if floor_collision_normal != Vector3.ZERO:
+					wall_collision_normal = Vector3(wall_collision_normal.x,0,wall_collision_normal.z).normalized()
+				else:
+					vel.y -= gravity * delta
 				vel = vel.slide(wall_collision_normal)
-				#vel = vel.slide(Vector3(wall_collision_normal.x, 0, wall_collision_normal.z).normalized())
 				if vel.y > 0 and floor_collision_normal == Vector3.ZERO:
 					vel.y = 0 #prevent wall climbing
-				vel.y -= gravity * delta
 			else:
 				on_wall = false
 			if (ceiling_collision_normal != Vector3.ZERO):
@@ -233,7 +231,7 @@ func _physics_process(delta):
 					if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91:#ceiling
 						vel = vel.slide(normal)
 						#vel = vel - ((vel.dot(normal))/normal.length()) * normal
-					elif (normal.angle_to(Vector3.UP) <= max_floor_angle):#floor
+					elif (normal.angle_to(Vector3.UP) <= max_flr_ang):#floor
 						snap_vector = Vector3.DOWN * (Vector3(vel.x, clamp(vel.y,0,9999999), vel.z).length()+5) * snap_magnitude
 					else:#wall
 						on_wall = true

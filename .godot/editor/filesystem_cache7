@@ -1,15 +1,16 @@
 0b7126e0c6e86d3ec295a72f5aa6e0bd
-::res://::1666426039
-console.gd::GDScript::-1::1666423455::0::1::::<>Control<>::
+::res://::1666484643
+console.gd::GDScript::-1::1666426411::0::1::::<>Control<>::
 crosshair.png::CompressedTexture2D::5530667488827933405::1666423455::1666423455::1::::<><>::
 dry-wood-texture-861x574.jpg::CompressedTexture2D::3887133562799542425::1666423455::1666423455::1::::<><>::
 export_presets.cfg::TextFile::-1::1666423455::0::1::::<><>::
 gamepro5.svg::CompressedTexture2D::5207533365650655642::1666423455::1666424499::1::::<><>::
 gamepro5_trans_1080p.png::CompressedTexture2D::6277008955317940717::1666423455::1666423455::1::::<><>::
 gp5_avatar.png::CompressedTexture2D::1498275032893080219::1666423455::1666423455::1::::<><>::
-map.tscn::PackedScene::2962705921355715084::1666424567::0::1::::<><>::uid://bllr5m8pcpyrp<>uid://cu5nrxyw4e38c<>uid://bvm7r0ji7w0yv<>uid://cod8ib4ryjhjd<>uid://dtafai4f6438g
-Player.gd::GDScript::-1::1666423455::0::1::::<>CharacterBody3D<>::
-Player.tscn::PackedScene::6239370498321873412::1666424567::0::1::::<><>::res://Player.gd<>uid://fxecspr3asp1
+License.md::TextFile::-1::1666428656::0::1::::<><>::
+map.tscn::PackedScene::2962705921355715084::1666483101::0::1::::<><>::uid://bllr5m8pcpyrp<>uid://cu5nrxyw4e38c<>uid://bvm7r0ji7w0yv<>uid://cod8ib4ryjhjd<>uid://dtafai4f6438g<>uid://vl1mu0rbcv7h
+Player.gd::GDScript::-1::1666483102::0::1::::<>CharacterBody3D<>::
+Player.tscn::PackedScene::6239370498321873412::1666483102::0::1::::<><>::res://Player.gd<>uid://fxecspr3asp1
 PrimitiveCharacterBody.gd::GDScript::-1::1666423455::0::1::::<>CharacterBody3D<>::
 PrimitiveCharacterBody.tscn::PackedScene::1381715309045912273::1666423455::0::1::::<><>::res://PrimitiveCharacterBody.gd
 raw2.obj::Mesh::8493154130421656848::1666423455::1666423455::1::::<><>::
@@ -17,4 +18,4 @@ raw3.jpg::CompressedTexture2D::5763696356820881913::1666423455::1666423455::1:::
 README.md::TextFile::-1::1666423455::0::1::::<><>::
 tileable-tt7002066-grey.png::CompressedTexture2D::3182292563643860969::1666423455::1666423455::1::::<><>::
 ui.gd::GDScript::-1::1666423455::0::1::::<>Control<>::
-ui.tscn::PackedScene::398672315494622208::1666424567::0::1::::<><>::res://ui.gd<>res://console.gd<>uid://ck2djybkocasj
+ui.tscn::PackedScene::398672315494622208::1666483102::0::1::::<><>::res://ui.gd<>res://console.gd<>uid://ck2djybkocasj
