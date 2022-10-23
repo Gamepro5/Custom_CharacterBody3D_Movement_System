@@ -5,7 +5,7 @@
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_ftt7i"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_qnjpc"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_txu75"]
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 axis_lock_angular_x = true
@@ -17,7 +17,7 @@ max_floor_angle = 65.0
 [node name="Torso" type="Node3D" parent="."]
 
 [node name="Head" type="Node3D" parent="Torso"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.766845, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
 [node name="FirstPersonCam" type="Camera3D" parent="Torso/Head"]
 current = true
@@ -41,4 +41,4 @@ debug_shape_custom_color = Color(1, 0, 0, 1)
 mesh = SubResource("CapsuleMesh_ftt7i")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("CapsuleShape3D_qnjpc")
+shape = SubResource("CapsuleShape3D_txu75")

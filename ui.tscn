@@ -61,6 +61,14 @@ offset_right = 82.0
 offset_bottom = 188.0
 text = "on_ceiling"
 
+[node name="floor_angle" type="Label" parent="."]
+offset_left = 6.0
+offset_top = 187.0
+offset_right = 83.0
+offset_bottom = 213.0
+text = "floor_angle
+"
+
 [node name="velmag" type="Label" parent="."]
 offset_left = 2.0
 offset_top = 84.0

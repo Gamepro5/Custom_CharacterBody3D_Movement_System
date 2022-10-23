@@ -219,6 +219,7 @@ func _physics_process(delta):
 			move_and_collide(vel*delta, false, 0.001, false)
 			$SurfaceNormal.set_rotation(- $SurfaceNormal.get_parent().rotation)
 			$SurfaceNormal.target_position = floor_collision_normal*SPEED/5;
+			$UI/floor_angle.text = "floor_angle: " + var_to_str(rad_to_deg(floor_collision_normal.angle_to(Vector3.UP)))
 		else:
 			if previously_on_floor == true and snap_vector != Vector3.ZERO:
 				vel.y = 0 #stop your falling speed from increasing if you slid off a slope.
@@ -243,7 +244,6 @@ func _physics_process(delta):
 			else:
 				on_wall = false
 				on_ceiling = false
-		
 	else:
 		move_and_collide(vel*delta) # noclip movement
 	previously_on_floor = on_floor
