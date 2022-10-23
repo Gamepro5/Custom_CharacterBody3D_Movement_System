@@ -13,7 +13,7 @@ var horizontal
 @export var gravity = 28
 var dir = Vector3.ZERO
 var vel = Vector3(0,0,0)
-@export_range(0, 89, 1) var max_floor_angle = 45
+@export_range(0, 89, 1) var max_floor_angle = 65
 var last_col_normal = Vector3.UP
 var previous_vel = Vector3.ZERO
 var on_floor = false
@@ -27,7 +27,7 @@ var cached_impulses = []
 @export var noclip = false
 @export var mouse_sensitivity = 0.05
 var wall_collision_normal = Vector3.ZERO #needed so we can choose how we apply the input velocity when touching walls
-@export var max_air_jumps = 0 #CHANGE THIS VALUE TO ADJUST YOUR MAX AIR JUMPS (SCOUT FROM TF2 HAS 1)
+@export var max_air_jumps = 1 #CHANGE THIS VALUE TO ADJUST YOUR MAX AIR JUMPS (SCOUT FROM TF2 HAS 1)
 var air_jumps = 0 #DON'T FUCKING TOUCH THIS VALUE
 var input_dir = Vector2.ZERO
 var previously_on_floor = false
@@ -90,10 +90,7 @@ func _physics_process(delta):
 	
 	$Velocity.set_rotation(- $Velocity.get_parent().rotation)
 	$Velocity.target_position = vel/5;
-	
-	$SurfaceNormal.set_rotation(- $SurfaceNormal.get_parent().rotation)
-	$SurfaceNormal.target_position = last_col_normal*SPEED/5;
-	
+		
 	$HorizontalVel.set_rotation(- $HorizontalVel.get_parent().rotation)
 	$HorizontalVel.target_position = Vector3(vel.x,0,vel.z)/5;
 	
@@ -148,7 +145,7 @@ func _physics_process(delta):
 		var ground_check = null
 		var col_normals = []
 		if (snap_vector!=Vector3.ZERO): # snap vector is only unset from zero in the "in air" part of this code, where a collision would set it to Vector3.DOWN
-			ground_check = move_and_collide(snap_vector, true, 0.1, true, 3)
+			ground_check = move_and_collide(snap_vector, true, 0.001, true, 3)
 		if ground_check:
 			var normal = ground_check.get_normal()
 			last_col_normal = normal;
@@ -160,11 +157,12 @@ func _physics_process(delta):
 				normal = ground_check.get_normal(i)
 				col_normals.push_back(normal)
 				if (normal.angle_to(Vector3.UP) <= max_flr_ang): #slope counts as the floor
-					var ground_check2 = move_and_collide(Vector3.DOWN*0.005, true, 0.1, true) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector.
+					var ground_check2 = move_and_collide(Vector3.DOWN*0.005, true, 0.001, true) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector.
 					if !ground_check2:
 						move_and_collide(Vector3.DOWN*0.5,false, 0.001, true) #snap
 					vel.y = 0;
 					on_floor = true
+					floor_collision_normal += normal
 					vel.y = (-normal.z*vel.z-normal.x*vel.x)/normal.y
 					if (normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completle`y vertical wall. Good luck with that lol.
 						vel.y = 0
@@ -172,7 +170,7 @@ func _physics_process(delta):
 					#wall_collision_normal = normal
 					pass
 			### this may need to be done recursively
-			var col = move_and_collide(vel*delta, true, 0.01, true, 5)
+			var col = move_and_collide(vel*delta, true, 0.001, true, 5)
 			#if !col:
 				#move_and_collide(vel*delta, false, 0.001, false)
 			if col:
@@ -183,21 +181,23 @@ func _physics_process(delta):
 					normal = col.get_normal(i)
 					col_normals.push_back(normal)
 					if (normal.angle_to(Vector3.UP) <= max_flr_ang): #slope counts as the floor
-						floor_collision_normal = col.get_normal(i)
+						floor_collision_normal += col.get_normal(i)
 				###
 					else: #collision is not the floor. it is either a ceiling or a wall.
 						if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91: #collision is ceiling
-							ceiling_collision_normal = col.get_normal(i)
+							ceiling_collision_normal += col.get_normal(i)
 						else:
-							wall_collision_normal = col.get_normal(i)
+							wall_collision_normal += col.get_normal(i)
 							#vel = vel - ((vel.dot(normal))/normal.length()) * normal
 			if (floor_collision_normal != Vector3.ZERO):
+				floor_collision_normal = floor_collision_normal.normalized()
 				on_floor = true
 				vel.y = (-floor_collision_normal.z*vel.z-floor_collision_normal.x*vel.x)/floor_collision_normal.y
 				if (floor_collision_normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
 					vel.y = 0
 				air_jumps = max_air_jumps
 			if (wall_collision_normal != Vector3.ZERO):
+				wall_collision_normal = wall_collision_normal.normalized()
 				on_wall = true
 				if floor_collision_normal != Vector3.ZERO:
 					wall_collision_normal = Vector3(wall_collision_normal.x,0,wall_collision_normal.z).normalized()
@@ -209,6 +209,7 @@ func _physics_process(delta):
 			else:
 				on_wall = false
 			if (ceiling_collision_normal != Vector3.ZERO):
+				ceiling_collision_normal = ceiling_collision_normal.normalized()
 				on_ceiling = true
 				vel = vel.slide(Vector3(ceiling_collision_normal.x, 0, ceiling_collision_normal.z).normalized()) # this will only execute if we are on the ground. this is helpful because we want to slide along it as if it were a wall, and not a ceiling. That way we can actually slide along it and it won't try to push us down into the ground.
 			else:
@@ -216,6 +217,8 @@ func _physics_process(delta):
 			#if col:
 				#move_and_collide(vel.normalized() * collision_remainder.length()) #move the remainder of the distnace up the slope
 			move_and_collide(vel*delta, false, 0.001, false)
+			$SurfaceNormal.set_rotation(- $SurfaceNormal.get_parent().rotation)
+			$SurfaceNormal.target_position = floor_collision_normal*SPEED/5;
 		else:
 			if previously_on_floor == true and snap_vector != Vector3.ZERO:
 				vel.y = 0 #stop your falling speed from increasing if you slid off a slope.
@@ -240,9 +243,9 @@ func _physics_process(delta):
 			else:
 				on_wall = false
 				on_ceiling = false
+		
 	else:
 		move_and_collide(vel*delta) # noclip movement
-	
 	previously_on_floor = on_floor
 	previous_vel = vel
 	previous_dir = dir

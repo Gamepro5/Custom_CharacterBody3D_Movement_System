@@ -53,7 +53,7 @@ func fov_desired(params):
 	player.get_node("Torso").get_node("Head").get_node("ThirdPersonCam").set_fov(str_to_var(params[0]))
 	player.get_node("Torso").get_node("Head").get_node("FirstPersonCam").set_fov(str_to_var(params[0]))
 
-func _host_timescale(params):
+func host_timescale(params):
 	Engine.set_time_scale(str_to_var(params[0]))
 
 func fullscreen(_params):
