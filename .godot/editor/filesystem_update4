@@ -1,5 +1,4 @@
-res://ui.tscn
-res://Player.gd
 res://map.tscn
 res://Player.tscn
-res://console.gd
+res://ui.tscn
+res://CharactedController.gd
