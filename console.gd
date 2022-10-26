@@ -3,6 +3,12 @@ extends Control
 @onready var input = $Input
 @onready var output = $Output
 @onready var player = get_parent().get_parent()
+var autoexec = "fullscreen"
+
+####################################
+######### start of convar definitions
+####################################
+
 enum {#useless rn
 		ARG_INT,
 		ARG_STRING,
@@ -22,7 +28,8 @@ const convars = [
 	["fullscreen", []],
 	["noclip", []],
 	["cl_set_speed", [ARG_FLOAT]],
-	["cl_set_maxjumps", [ARG_FLOAT]]
+	["cl_set_maxjumps", [ARG_FLOAT]],
+	["clear", []]
 ]
 func help(_params):
 	output.text += "Here is a list of all convars. (Documentation not included because I'm lazy):\n"
@@ -62,7 +69,7 @@ func fullscreen(_params):
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 
-func noclip(params):
+func noclip(_params):
 	player.noclip = !player.noclip
 	player.get_node("CollisionHull").disabled = !player.get_node("CollisionHull").disabled
 
@@ -72,9 +79,16 @@ func cl_set_speed(params):
 func cl_set_maxjumps(params):
 	player.max_air_jumps = str_to_var(params[0])
 	
-func evaluate_input(input:String):
+func clear(_params):
+	output.clear()
+
+####################################
+######### end of convar definitions
+####################################
+
+func evaluate_input(input_str:String):
 	
-	for k in input.split(";"):
+	for k in input_str.split(";"):
 		var params = k.split(" ")
 		params = Array(params)
 		var found = false;
@@ -94,14 +108,17 @@ func evaluate_input(input:String):
 		if !found:
 			output.text += "Error! Invalid convar: '" + params[0] + "'.\n"
 		
-
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
+func _unhandled_input(event):
+	if event.is_action_pressed("mouse_input"):
+		if Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-			set_visible(false)
-		elif Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			
+func _input(event: InputEvent) -> void:
+	
+	if event.is_action_pressed("ui_cancel"):
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+			set_visible(false)
 	if event is InputEventKey:
 		if event.is_action_pressed("console"):
 			set_visible(!is_visible())
@@ -113,6 +130,8 @@ func _input(event: InputEvent) -> void:
 			if event.is_action_pressed("console_submit"):
 				if input.text.length() > 0:
 					evaluate_input(input.text)
+					input.clear()
+					output.scroll_vertical = 999999999 # scroll to bottom lol
 		
 		if event.is_action_released("console"):
 			if is_visible():
@@ -121,3 +140,5 @@ func _input(event: InputEvent) -> void:
 			
 
 
+func _ready():
+	evaluate_input(autoexec)

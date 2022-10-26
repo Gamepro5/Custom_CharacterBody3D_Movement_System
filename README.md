@@ -2,8 +2,6 @@
 A fully custom made replacement for Godot 4's broken and useless "move_and_slide()" function. Was designed to imitate the source engine's character controller as closely as possible, with a few of my own tweaks and improvements.
 
 To-do:
-- Await Godot to fix physics detection bugs (see github) aka Figure out safe_margin annoyances
-- Code cleanup?
+- Await Godot to fix bad collision percision, especially above y=250 and why convex meshes corners can sometimes act like walls to the bottom most part of a capsule.
 - Swimming
 - Climbing
-- Stair Stepping

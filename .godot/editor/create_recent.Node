@@ -1,10 +1,11 @@
+Node3D
 MeshInstance3D
+RigidBody3D
 StaticBody3D
+CharacterBody3D
 CollisionShape3D
 CSGBox3D
 Camera3D
-Node3D
-CharacterBody3D
 CSGCombiner3D
 OccluderInstance3D
 DirectionalLight3D
