@@ -66,4 +66,5 @@ mouse_input={
 3d/run_on_separate_thread=true
 common/physics_ticks_per_second=240
 common/physics_jitter_fix=0.0
-3d/solver/solver_iterations=64
+3d/physics_engine="GodotPhysics3D"
+3d/solver/solver_iterations=246
