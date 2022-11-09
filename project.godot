@@ -11,8 +11,8 @@ config_version=5
 [application]
 
 config/name="CustomCharacterController"
-run/main_scene="res://map.tscn"
-config/features=PackedStringArray("4.0", "Forward Plus")
+run/main_scene="res://maps/dev_test/dev_test.tscn"
+config/features=PackedStringArray("4.0", "Double Precision", "Forward Plus")
 boot_splash/image="res://gamepro5_trans_1080p.png"
 boot_splash/bg_color=Color(0.666667, 0.658824, 0.678431, 1)
 config/icon="res://gamepro5.svg"
@@ -67,4 +67,3 @@ mouse_input={
 common/physics_ticks_per_second=240
 common/physics_jitter_fix=0.0
 3d/physics_engine="GodotPhysics3D"
-3d/solver/solver_iterations=246

@@ -3,7 +3,7 @@ extends Control
 @onready var input = $Input
 @onready var output = $Output
 @onready var player = get_parent().get_parent()
-var autoexec = "fullscreen"
+var autoexec = ""
 
 ####################################
 ######### start of convar definitions

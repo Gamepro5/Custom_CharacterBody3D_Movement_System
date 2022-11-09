@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://daq10hcfcel7a"]
+[gd_scene load_steps=6 format=3 uid="uid://daq10hcfcel7a"]
 
 [ext_resource type="Script" path="res://CharactedController.gd" id="1_p4rr7"]
 [ext_resource type="PackedScene" uid="uid://fxecspr3asp1" path="res://ui.tscn" id="2_hkjrl"]
@@ -8,6 +8,8 @@ size = Vector3(1, 2, 1)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_el7g1"]
 custom_solver_bias = 0.1
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_e1g7x"]
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 axis_lock_angular_x = true
@@ -28,14 +30,20 @@ current = true
 transform = Transform3D(1, 0, 0, 0, 0.841294, 0.540578, 0, -0.540578, 0.841294, 0, 5.91603, 7.23098)
 
 [node name="Velocity" type="RayCast3D" parent="."]
+collide_with_bodies = false
+debug_shape_custom_color = Color(0, 1, 0, 1)
 
 [node name="snapVector" type="RayCast3D" parent="."]
 collide_with_bodies = false
 debug_shape_custom_color = Color(1, 0, 0, 1)
 
 [node name="SurfaceNormal" type="RayCast3D" parent="."]
+collide_with_bodies = false
+debug_shape_custom_color = Color(1, 1, 0, 1)
 
 [node name="HorizontalVel" type="RayCast3D" parent="."]
+collide_with_bodies = false
+debug_shape_custom_color = Color(0, 0, 1, 1)
 
 [node name="UI" parent="." instance=ExtResource("2_hkjrl")]
 
@@ -45,3 +53,11 @@ mesh = SubResource("BoxMesh_e3tg1")
 
 [node name="CollisionHull" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_el7g1")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("CapsuleShape3D_e1g7x")
+
+[connection signal="area_entered" from="Area3D" to="." method="_on_area_3d_area_entered"]
+[connection signal="area_exited" from="Area3D" to="." method="_on_area_3d_area_exited"]
