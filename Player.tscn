@@ -6,17 +6,17 @@
 [sub_resource type="BoxMesh" id="BoxMesh_e3tg1"]
 size = Vector3(1, 2, 1)
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_el7g1"]
-custom_solver_bias = 0.1
+[sub_resource type="BoxShape3D" id="BoxShape3D_m52cf"]
+size = Vector3(1, 2, 1)
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_e1g7x"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_4borl"]
+size = Vector3(1, 2, 1)
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 axis_lock_angular_x = true
 axis_lock_angular_y = true
 axis_lock_angular_z = true
 script = ExtResource("1_p4rr7")
-max_floor_angle = 65.0
 
 [node name="Torso" type="Node3D" parent="."]
 
@@ -41,23 +41,22 @@ debug_shape_custom_color = Color(1, 0, 0, 1)
 collide_with_bodies = false
 debug_shape_custom_color = Color(1, 1, 0, 1)
 
-[node name="HorizontalVel" type="RayCast3D" parent="."]
+[node name="InputDirection" type="RayCast3D" parent="."]
 collide_with_bodies = false
 debug_shape_custom_color = Color(0, 0, 1, 1)
 
 [node name="UI" parent="." instance=ExtResource("2_hkjrl")]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-visible = false
 mesh = SubResource("BoxMesh_e3tg1")
 
 [node name="CollisionHull" type="CollisionShape3D" parent="."]
-shape = SubResource("CapsuleShape3D_el7g1")
+shape = SubResource("BoxShape3D_m52cf")
 
 [node name="Area3D" type="Area3D" parent="."]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
-shape = SubResource("CapsuleShape3D_e1g7x")
+[node name="CollisionHull" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_4borl")
 
 [connection signal="area_entered" from="Area3D" to="." method="_on_area_3d_area_entered"]
 [connection signal="area_exited" from="Area3D" to="." method="_on_area_3d_area_exited"]

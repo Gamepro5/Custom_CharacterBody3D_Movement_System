@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://fxecspr3asp1"]
+[gd_scene load_steps=3 format=3 uid="uid://fxecspr3asp1"]
 
 [ext_resource type="Script" path="res://ui.gd" id="1_jvkcx"]
-[ext_resource type="Script" path="res://console.gd" id="2_j2twt"]
 [ext_resource type="Texture2D" uid="uid://ck2djybkocasj" path="res://crosshair.png" id="3_4xomu"]
 
 [node name="UI" type="Control"]
@@ -78,14 +77,12 @@ offset_right = 63.0
 offset_bottom = 110.0
 text = "velmag"
 
-[node name="console_tip" type="Label" parent="."]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -26.0
-offset_right = 183.0
-grow_vertical = 0
-text = "press ` to open console"
+[node name="groundcheck" type="Label" parent="."]
+offset_left = 13.0
+offset_top = 208.0
+offset_right = 53.0
+offset_bottom = 234.0
+text = "groundcheck"
 
 [node name="copyright" type="Label" parent="."]
 anchors_preset = 3
@@ -99,32 +96,49 @@ grow_horizontal = 0
 grow_vertical = 0
 text = "© Gamepro5.com"
 
-[node name="Console" type="Control" parent="."]
-visible = false
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("2_j2twt")
-
-[node name="Output" type="TextEdit" parent="Console"]
-offset_left = 23.0
-offset_top = 13.0
-offset_right = 1130.0
-offset_bottom = 604.0
-
-[node name="Input" type="LineEdit" parent="Console"]
-offset_left = 23.0
-offset_top = 610.0
-offset_right = 1130.0
-offset_bottom = 641.0
-placeholder_text = "Type \"help\" for a list of convars!"
-
 [node name="Crosshair" type="Sprite2D" parent="."]
 position = Vector2(377.672, 303.672)
 scale = Vector2(0.0258919, 0.0258919)
 texture = ExtResource("3_4xomu")
+
+[node name="ceiling_normal" type="Label" parent="."]
+offset_left = 12.0
+offset_top = 284.0
+offset_right = 98.0
+offset_bottom = 310.0
+text = "ceiling_normal"
+
+[node name="floor_normal" type="Label" parent="."]
+offset_left = 12.0
+offset_top = 235.0
+offset_right = 112.0
+offset_bottom = 261.0
+text = "floor_normal
+"
+
+[node name="wall_normal" type="Label" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = -390.0
+offset_right = 198.0
+offset_bottom = -364.0
+grow_vertical = 0
+text = "wall_normal"
+
+[node name="in_water" type="Label" parent="."]
+offset_left = 15.0
+offset_top = 308.0
+offset_right = 116.0
+offset_bottom = 334.0
+text = "in_water"
+
+[node name="snapvector" type="Label" parent="."]
+offset_left = 13.0
+offset_top = 331.0
+offset_right = 114.0
+offset_bottom = 357.0
+text = "snapvector"
 
 [connection signal="resized" from="." to="." method="_on_resized"]
