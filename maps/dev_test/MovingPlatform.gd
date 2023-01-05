@@ -1,4 +1,4 @@
-extends StaticBody3D
+extends AnimatableBody3D
 
 var velocity = Vector3.ZERO
 var original_position = position

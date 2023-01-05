@@ -323,7 +323,6 @@ func _physics_process(delta):
 				if (ceiling_collision_normal != Vector3.ZERO):
 					
 					on_ceiling = true
-					var curspeed = vel.length()
 					var ceiling_floor_tangent = ceiling_collision_normal.cross(floor_collision_normal).normalized()
 					if (wall_collision_normal != Vector3.ZERO):
 						var wall_floor_tangent = wall_collision_normal.cross(floor_collision_normal).normalized()

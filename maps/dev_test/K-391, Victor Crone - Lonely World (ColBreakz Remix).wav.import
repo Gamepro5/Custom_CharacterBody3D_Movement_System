@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://de08f634n1sso"
+path="res://.godot/imported/K-391, Victor Crone - Lonely World (ColBreakz Remix).wav-7cdb55c23cb020cc3acb627958d0ffc1.sample"
+
+[deps]
+
+source_file="res://maps/dev_test/K-391, Victor Crone - Lonely World (ColBreakz Remix).wav"
+dest_files=["res://.godot/imported/K-391, Victor Crone - Lonely World (ColBreakz Remix).wav-7cdb55c23cb020cc3acb627958d0ffc1.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

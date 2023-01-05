@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="CustomCharacterController"
-run/main_scene="res://maps/dev_test/dev_test.tscn"
+run/main_scene="res://game.tscn"
 config/features=PackedStringArray("4.0", "Double Precision", "Forward Plus")
 boot_splash/image="res://gamepro5_trans_1080p.png"
 boot_splash/bg_color=Color(0.666667, 0.658824, 0.678431, 1)
