@@ -46,7 +46,7 @@ var previously_on_floor = false
 @onready var hud = $UI
 var in_area = false
 var inherited_vel = Vector3.ZERO
-var stair_step_height = 1.5
+var stair_step_height = 0.5
 @onready var collisionHull = $CollisionHull
 @onready var originalCollisionHullSize = $CollisionHull.shape.size
 
