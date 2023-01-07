@@ -1,9 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://dc8x1sgfikid1"]
+[gd_scene load_steps=4 format=3 uid="uid://c1iot3hdo4a56"]
 
-[ext_resource type="PackedScene" uid="uid://daq10hcfcel7a" path="res://Player.tscn" id="1_6o2rv"]
+[ext_resource type="PackedScene" uid="uid://dqkmjkoqkdufd" path="res://player/Player.tscn" id="1_6o2rv"]
+[ext_resource type="Script" path="res://game.gd" id="1_mrnmh"]
 [ext_resource type="PackedScene" uid="uid://bacu6i87s4l2k" path="res://maps/dev_test/dev_test.tscn" id="2_hb246"]
 
 [node name="Game" type="Node"]
+script = ExtResource("1_mrnmh")
 
 [node name="Players" type="Node3D" parent="."]
 

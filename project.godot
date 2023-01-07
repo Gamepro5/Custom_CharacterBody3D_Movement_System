@@ -20,7 +20,7 @@ config/windows_native_icon="res://favicon.ico"
 
 [autoload]
 
-Trace="*res://autoload/Trace.gd"
+Trace="*res://lib/Trace.gd"
 
 [input]
 

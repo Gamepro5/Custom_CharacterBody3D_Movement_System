@@ -1,0 +1,73 @@
+[gd_scene load_steps=8 format=3 uid="uid://dqkmjkoqkdufd"]
+
+[ext_resource type="Script" path="res://player/CharactedController.gd" id="1_xse20"]
+[ext_resource type="PackedScene" uid="uid://fxecspr3asp1" path="res://ui.tscn" id="2_hkjrl"]
+[ext_resource type="Script" path="res://player/FootStepPlayer.gd" id="3_x3wm7"]
+[ext_resource type="Script" path="res://lib/GeneralAudioPlayer.gd" id="4_1mg0h"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_e3tg1"]
+size = Vector3(1, 2, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m52cf"]
+size = Vector3(1, 2, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4borl"]
+size = Vector3(1, 2, 1)
+
+[node name="CharacterBody3D" type="CharacterBody3D"]
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+script = ExtResource("1_xse20")
+
+[node name="Torso" type="Node3D" parent="."]
+
+[node name="Head" type="Node3D" parent="Torso"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.724702, 0)
+
+[node name="FirstPersonCam" type="Camera3D" parent="Torso/Head"]
+current = true
+
+[node name="ThirdPersonCam" type="Camera3D" parent="Torso/Head"]
+transform = Transform3D(1, 0, 0, 0, 0.841294, 0.540578, 0, -0.540578, 0.841294, 0, 5.91603, 7.23098)
+
+[node name="Velocity" type="RayCast3D" parent="."]
+collide_with_bodies = false
+debug_shape_custom_color = Color(0, 1, 0, 1)
+
+[node name="snapVector" type="RayCast3D" parent="."]
+collide_with_bodies = false
+debug_shape_custom_color = Color(1, 0, 0, 1)
+
+[node name="SurfaceNormal" type="RayCast3D" parent="."]
+collide_with_bodies = false
+debug_shape_custom_color = Color(1, 1, 0, 1)
+
+[node name="InputDirection" type="RayCast3D" parent="."]
+collide_with_bodies = false
+debug_shape_custom_color = Color(0, 0, 1, 1)
+
+[node name="UI" parent="." instance=ExtResource("2_hkjrl")]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_e3tg1")
+
+[node name="CollisionHull" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_m52cf")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionHull" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_4borl")
+
+[node name="FootStepPlayer" type="AudioStreamPlayer3D" parent="."]
+script = ExtResource("3_x3wm7")
+
+[node name="SoundEffectPlayer" type="AudioStreamPlayer3D" parent="."]
+script = ExtResource("4_1mg0h")
+
+[node name="SoundEffectPlayer2" type="AudioStreamPlayer3D" parent="."]
+script = ExtResource("4_1mg0h")
+
+[connection signal="area_entered" from="Area3D" to="." method="_on_area_3d_area_entered"]
+[connection signal="area_exited" from="Area3D" to="." method="_on_area_3d_area_exited"]
