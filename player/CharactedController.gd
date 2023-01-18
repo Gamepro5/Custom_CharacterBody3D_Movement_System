@@ -1,20 +1,20 @@
-extends CharacterBody3D
+class_name CharacterController extends CharacterBody3D
 
 
-@export_range(0, 100, 0.1) var SPEED : float = 7
+@export_range(0, 100, 0.1) var SPEED : float = 10
 @export var CROUCH_SPEED = SPEED/3
 var current_speed = SPEED
-@export var JUMP_vel = 10
+@export var JUMP_vel = 10#
 @export var ACCELERATION = 15#8.5725
 @export var DECELERATION = 5.5
 @export var STRAFE_DECELERATION = 10
 var current_acceleration = ACCELERATION
 var current_deceleration = DECELERATION
 var current_strafe_deceleration = STRAFE_DECELERATION
-@export var AIR_ACCELERATION = 10
+@export var AIR_ACCELERATION = 1
 @export var AIR_DECELERATION = 15
-@export var AIR_STRAFE_ACCELERATION = 1
-var mouse_axis = Vector2.ZERO
+@export var AIR_STRAFE_ACCELERATION = 5
+@export var mouse_axis = Vector2.ZERO
 var vel = Vector3.ZERO
 @export var gravity = Vector3(0,-28,0)
 var current_gravity = gravity
@@ -27,7 +27,7 @@ var on_ceiling = false
 var in_water = false
 var impulse_vel = Vector3.ZERO
 var snap_vector = Vector3.ZERO
-var snap_magnitude = 0.5
+var snap_magnitude = 1#0.5
 var previous_dir = Vector3.ZERO
 @export var noclip = false
 @export var mouse_sensitivity = 0.15#0.05
@@ -43,7 +43,7 @@ var previously_on_floor = false
 @onready var hud = $UI
 var in_area = false
 var inherited_vel = Vector3.ZERO
-var stair_step_height = 0.5
+@export var stair_step_height = 1
 @onready var collisionHull = $CollisionHull
 @onready var originalCollisionHullSize = $CollisionHull.shape.size
 @onready var FootStepPlayer = $FootStepPlayer
@@ -53,15 +53,15 @@ var uncrouch_check_run = false
 var crouched = false
 @onready var trace = Trace.new()
 @onready var original_eye_height = $Torso/Head.position.y
-var wall_collision_normals = []
 var ceiling_collision_normals = []
-var floor_collision_normals = []
 
 func crouch():
 	if !crouched:
 		collisionHull.shape.size.y = crouchHeight
 		$Area3D/CollisionHull.shape.size.y = crouchHeight
 		current_speed = CROUCH_SPEED
+		current_deceleration = DECELERATION*3
+		current_strafe_deceleration = STRAFE_DECELERATION*3
 		#position.y += ((originalCollisionHullSize.y/2)-crouchHeight/2)
 		#$Torso.position.y = -(offset)
 		#$Torso/Head.position.y = (original_eye_height / originalCollisionHullSize.y) * crouchHeight #proportional with uncrouched eye height
@@ -84,15 +84,17 @@ func uncrouch_check(): #checks if the player can uncrouch. if yes, proceeds to u
 			collisionHull.shape.size.y = originalCollisionHullSize.y
 			$Area3D/CollisionHull.shape.size.y = originalCollisionHullSize.y
 			current_speed = SPEED
+			current_deceleration = DECELERATION
+			current_strafe_deceleration = STRAFE_DECELERATION
 			uncrouch_check_run = false
 			crouched = false
 		else:
 			uncrouch_check_run = true
 			crouched = true
 
-func _input(event: InputEvent) -> void:
+func _input(event: InputEvent):
 	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-		
+			
 		if event.is_action_pressed("crouch"):
 			crouch()
 				
@@ -111,33 +113,11 @@ func _input(event: InputEvent) -> void:
 			$Torso/Head.rotation.x = clamp($Torso/Head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 				
 			
-#func apply_impulse(vect: Array):
-	#cached_impulses.append(vect)
-	#vel += cached_impulses
+
 func apply_impulse(vector: Vector3, position: Vector3 = Vector3.ZERO):
 	vel += vector
 	snap_vector = Vector3.ZERO
 	
-func _ready():
-	#Engine.set_time_scale(0.1)
-	pass
-	
-
-
-func accelerate(accel, deltat):
-	var wishspeed = current_speed#
-	var currentspeed = Vector3(vel.x,0,vel.z).dot(dir)
-	var addspeed = wishspeed - currentspeed
-	
-	if addspeed <= 0:
-		return
-	
-	var accelspeed = accel * deltat * wishspeed * 1
-	
-	if (accelspeed > addspeed):
-		accelspeed = addspeed
-	
-	vel += dir * accelspeed
 
 func _physics_process(delta):
 	
@@ -180,7 +160,8 @@ func _physics_process(delta):
 		if Input.is_action_just_pressed("jump") and !noclip and !in_water:
 			if on_floor:
 				vel.y = 0
-				apply_impulse(dir*current_speed + Vector3(0,JUMP_vel,0))
+				#apply_impulse(dir*current_speed + Vector3(0,JUMP_vel,0))
+				apply_impulse(Vector3(0,JUMP_vel,0))
 				$SoundEffectPlayer2.play_sound(FootStepPlayer.getRandomFootstepPath(FootStepPlayer.groundtype), 1.1, 1)
 			elif on_wall and wall_jumps > 0:
 				apply_impulse(((wall_collision_normal * 5) + (Vector3.UP * JUMP_vel)) + vel.slide(wall_collision_normal) * Vector3(1,0,1))
@@ -208,21 +189,23 @@ func _physics_process(delta):
 	var velxz = Vector3(vel.x,0,vel.z)
 	
 	
-	
+	#vel = dir*current_speed
+	#vel.y=temp
+
 	var accel_step = ((1) if (current_acceleration * delta > 1) else (current_acceleration * delta))
 	var decel_step = ((1) if (current_deceleration * delta > 1) else (current_deceleration * delta))
 	var strafe_accel_step = ((1) if (current_strafe_deceleration * delta > 1) else (current_strafe_deceleration * delta))
 	
 	if (on_floor):
-		if (dir.dot(vel) < 0): #player is trying to move in the opposite direction he is moving
+		if (dir.dot(velxz) < 0): #player is trying to move in the opposite direction he is moving
 			vel = vel.lerp(dir*current_speed, strafe_accel_step)
-		elif (dir != Vector3.ZERO): #player trying to move
+		elif (dir != Vector3.ZERO) and (velxz.length() <= (dir*current_speed).length()): #player trying to move
 			vel = vel.lerp(dir*current_speed, accel_step)
 		else: #player is not trying to move
 			vel = vel.lerp(dir*current_speed, decel_step)
 		vel.y = temp
 	elif in_water:
-		if (dir.dot(vel) > 0) && dir != Vector3.ZERO: # makes it easy to stop your trajectory, but if you wish to change, you won't be able to super well. this is similar to tf2.
+		if (dir.dot(velxz) > 0) && dir != Vector3.ZERO: # makes it easy to stop your trajectory, but if you wish to change, you won't be able to super well. this is similar to tf2.
 			vel = vel.lerp(dir*current_speed, accel_step)
 		else:
 			vel = vel.lerp(dir*current_speed, decel_step)
@@ -230,16 +213,22 @@ func _physics_process(delta):
 		var vel_length = velxz.length()
 		if dir == Vector3.ZERO:
 			dir = Vector3(vel.x,0,vel.z)/current_speed
-		if (dir.dot(vel) > 0) && dir != Vector3.ZERO: # makes it easy to stop your trajectory, but if you wish to change, you won't be able to super well. this is similar to tf2.
-			vel = vel.lerp(dir*current_speed, AIR_ACCELERATION * delta)
-			vel = Vector3(vel.x,0,vel.z).normalized() * vel_length # air movement does not affect the velocity length, only the rotation.
+		if (dir.dot(velxz) > 0) && dir != Vector3.ZERO: # makes it easy to stop your trajectory, but if you wish to change, you won't be able to super well. this is similar to tf2.
+			vel = vel.lerp(dir*current_speed, AIR_STRAFE_ACCELERATION * delta)
+			if Vector3(vel.x,0,vel.z).length() < vel_length:
+				vel = Vector3(vel.x,0,vel.z).normalized() * vel_length # air movement does not affect the velocity length, only the rotation.
+			else:
+				vel = velxz.lerp(dir*current_speed, AIR_ACCELERATION * delta)
+			
 		else:
 			vel = vel.lerp(dir*current_speed, AIR_DECELERATION * delta)
 		vel.y = temp
-	if (Vector3(vel.x,0,vel.z).length() < 0.1) and (Vector3(vel.x,0,vel.z).length() < Vector3(previous_vel.x,0,previous_vel.z).length()): #sigfigs! if we are decelerating and our velocity's magnitude is less than 0.1, just stop.
+		
+	velxz = Vector3(vel.x,0,vel.z)
+	if (velxz.length() < 0.1) and (velxz.length() < Vector3(previous_vel.x,0,previous_vel.z).length()): #sigfigs! if we are decelerating and our velocity's magnitude is less than 0.1, just stop.
 		vel.x = 0
 		vel.z = 0
-	
+
 	
 	$snapVector.set_rotation(- $snapVector.get_parent().rotation)
 	$snapVector.target_position = snap_vector;
@@ -251,8 +240,6 @@ func _physics_process(delta):
 		if ground_check:
 			FootStepPlayer.update_groundtype(ground_check)
 			hud.get_node("groundcheck").text = "groundcheck: true"
-			wall_collision_normal = Vector3.ZERO
-			ceiling_collision_normal = Vector3.ZERO
 			floor_collision_normal = Vector3.UP
 			if floor_collision_normal != Vector3.ZERO:
 				floor_collision_normal = Vector3.ZERO
@@ -261,19 +248,32 @@ func _physics_process(delta):
 					if !snap_ground_check:
 						snap_ground_check = move_and_collide(snap_vector*snap_magnitude*(1+(delta*10)), false, 0.001, false, 3)
 					if snap_ground_check:
-						var ground_collision_normals = []
 						var average_normal = Vector3.ZERO
 						for i in range(snap_ground_check.get_collision_count()):
 							var normal = snap_ground_check.get_normal(i)
-							ground_collision_normals.append(normal)
-							average_normal += snap_ground_check.get_normal(i)
-						average_normal /= snap_ground_check.get_collision_count()
-						if (average_normal.angle_to(Vector3.UP) <= max_flr_ang):
-							floor_collision_normal = average_normal
-						else:
-							if rad_to_deg(average_normal.angle_to(Vector3.UP)) <= 90:
-								wall_collision_normal = average_normal
+							if (normal.angle_to(Vector3.UP) <= max_flr_ang):
+								floor_collision_normal = normal
+							elif rad_to_deg(normal.angle_to(Vector3.UP)) < 90:
+								average_normal += normal
+						var fallback_average_normal = average_normal
+						average_normal = average_normal.normalized()
+						$AverageNormal.set_rotation(- $AverageNormal.get_parent().rotation)
+						$AverageNormal.target_position = average_normal;
+						if (average_normal != Vector3.ZERO):
+							if (average_normal.angle_to(Vector3.UP) <= max_flr_ang):
+								floor_collision_normal = average_normal
+							else:
+								var verticalwallcol = move_and_collide(Vector3(average_normal.x,0,average_normal.z),true) #this is for the edge case of if the "slope" that we consider to be too steep to be a floor averages to not be a floor, but there is still the possibility that we are wedged between a steep slop and a perfectly straight wall. this straight wall's normal would not have been reported until now because the gorund check only checks under the player.
+								if verticalwallcol:
+									fallback_average_normal += verticalwallcol.get_normal()
+									fallback_average_normal = fallback_average_normal.normalized()
+									if (fallback_average_normal.angle_to(Vector3.UP) <= max_flr_ang):
+										floor_collision_normal = fallback_average_normal
+							#elif rad_to_deg(average_normal.angle_to(Vector3.UP)) < 90:
+							#	wall_collision_normal = average_normal
+							#	print("ground is wall")
 						if floor_collision_normal != Vector3.ZERO:
+							wall_collision_normal = Vector3.ZERO
 							on_floor = true
 							vel.y = 0;
 							vel.y = (-floor_collision_normal.z*vel.z-floor_collision_normal.x*vel.x)/floor_collision_normal.y
@@ -281,7 +281,8 @@ func _physics_process(delta):
 								vel.y = 0
 						else:
 							on_floor = false
-							#snap_vector = Vector3.ZERO
+							if !previously_on_floor:
+								snap_vector = Vector3.ZERO
 							
 					else:
 						on_floor = false
@@ -317,6 +318,8 @@ func _physics_process(delta):
 			var wall_collision_normal_override = Vector3.ZERO
 			var wall_collision_normal_overrides = []
 			if col:
+				wall_collision_normal = Vector3.ZERO
+				ceiling_collision_normal = Vector3.ZERO
 				for i in range(col.get_collision_count()):
 					var normal = col.get_normal(i)
 					if (normal.angle_to(Vector3.UP) <= max_flr_ang): #slope counts as the floor
@@ -327,7 +330,7 @@ func _physics_process(delta):
 							ceiling_collision_normal += col.get_normal(i)
 							ceiling_collision_normals.append(ceiling_collision_normal)
 						else:
-							wall_collision_normal_override = col.get_normal(i)
+							wall_collision_normal_override += col.get_normal(i)
 							wall_collision_normal_overrides.append(wall_collision_normal_override)
 							
 				if floor_collision_normal_overrides.size() > 0:
@@ -449,6 +452,8 @@ func _physics_process(delta):
 			$SurfaceNormal.target_position = floor_collision_normal;
 			hud.get_node("floor_angle").text = "floor_angle: " + var_to_str(rad_to_deg(floor_collision_normal.angle_to(Vector3.UP)))
 		else:
+			$SurfaceNormal.set_rotation(- $SurfaceNormal.get_parent().rotation)
+			$SurfaceNormal.target_position = Vector3.ZERO;
 			hud.get_node("groundcheck").text = "groundcheck: false"
 			if !in_area:
 				current_acceleration = ACCELERATION
@@ -473,6 +478,8 @@ func _physics_process(delta):
 					average_normal += col.get_normal(i)
 				average_normal /= col.get_collision_count()
 				average_normal = average_normal.normalized() # just in case
+				$AverageNormal.set_rotation(- $AverageNormal.get_parent().rotation)
+				$AverageNormal.target_position = average_normal;
 				if (average_normal.angle_to(Vector3.UP) <= max_flr_ang):
 					floor_collision_normal = average_normal	
 					
@@ -483,9 +490,9 @@ func _physics_process(delta):
 					snap_vector = Vector3.DOWN
 					FootStepPlayer.update_groundtype(col)
 					$SoundEffectPlayer2.play_sound(FootStepPlayer.getRandomFootstepPath(FootStepPlayer.groundtype), 0.9, 1)
-					if (vel.y < -30):
+					if (vel.y < -100):
 						SoundEffectPlayer.play_sound("sound/player/fallpain_intense.wav")
-					elif (vel.y < -15):
+					elif (vel.y < -30):
 						SoundEffectPlayer.play_sound("sound/player/fallpain.wav")
 				else:#wall
 					on_wall = true
@@ -504,12 +511,12 @@ func _physics_process(delta):
 			
 			
 		#STUCK IN SLOPED WALL FUNNEL FIX: (what Overwatch does)
-		if (on_wall and !on_floor and vel.y < -30):
-			vel.y = 10
-			snap_vector = Vector3.ZERO
-			on_floor = false
-			vel += wall_collision_normal*5
-			on_wall = false
+		#if (on_wall and !on_floor and vel.y < -30):
+		#	vel.y = 10
+		#	snap_vector = Vector3.ZERO
+		#	on_floor = false
+		#	vel += wall_collision_normal*5
+		#	on_wall = false
 			
 			
 		velocity = vel + inherited_vel

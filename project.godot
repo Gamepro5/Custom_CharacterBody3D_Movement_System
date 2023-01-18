@@ -8,19 +8,33 @@
 
 config_version=5
 
+_global_script_classes=[{
+"base": "CharacterBody3D",
+"class": &"CharacterController",
+"language": &"GDScript",
+"path": "res://player/CharactedController.gd"
+}]
+_global_script_class_icons={
+"CharacterController": ""
+}
+
 [application]
 
 config/name="CustomCharacterController"
 run/main_scene="res://game.tscn"
 config/features=PackedStringArray("4.0", "Double Precision", "Forward Plus")
-boot_splash/image="res://gamepro5_trans_1080p.png"
 boot_splash/bg_color=Color(0.666667, 0.658824, 0.678431, 1)
+boot_splash/image="res://gamepro5_trans_1080p.png"
 config/icon="res://gamepro5.svg"
 config/windows_native_icon="res://favicon.ico"
 
 [autoload]
 
 Trace="*res://lib/Trace.gd"
+
+[editor]
+
+export/convert_text_resources_to_binary=true
 
 [input]
 

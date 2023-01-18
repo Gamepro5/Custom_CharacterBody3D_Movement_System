@@ -43,6 +43,10 @@ debug_shape_custom_color = Color(1, 0, 0, 1)
 collide_with_bodies = false
 debug_shape_custom_color = Color(1, 1, 0, 1)
 
+[node name="AverageNormal" type="RayCast3D" parent="."]
+collide_with_bodies = false
+debug_shape_custom_color = Color(1, 0, 1, 1)
+
 [node name="InputDirection" type="RayCast3D" parent="."]
 collide_with_bodies = false
 debug_shape_custom_color = Color(0, 0, 1, 1)

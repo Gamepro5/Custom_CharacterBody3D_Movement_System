@@ -14,6 +14,7 @@ mouse_filter = 2
 script = ExtResource("1_jvkcx")
 
 [node name="pos" type="Label" parent="."]
+layout_mode = 0
 offset_left = 8.0
 offset_top = 5.0
 offset_right = 48.0
@@ -21,6 +22,7 @@ offset_bottom = 31.0
 text = "pos"
 
 [node name="velx" type="Label" parent="."]
+layout_mode = 0
 offset_left = 8.0
 offset_top = 27.0
 offset_right = 48.0
@@ -28,6 +30,7 @@ offset_bottom = 53.0
 text = "velx"
 
 [node name="vely" type="Label" parent="."]
+layout_mode = 0
 offset_left = 8.0
 offset_top = 45.0
 offset_right = 48.0
@@ -35,6 +38,7 @@ offset_bottom = 71.0
 text = "vely"
 
 [node name="velz" type="Label" parent="."]
+layout_mode = 0
 offset_left = 7.0
 offset_top = 65.0
 offset_right = 47.0
@@ -42,6 +46,7 @@ offset_bottom = 91.0
 text = "velz"
 
 [node name="on_floor" type="Label" parent="."]
+layout_mode = 0
 offset_left = 7.0
 offset_top = 106.0
 offset_right = 71.0
@@ -49,6 +54,7 @@ offset_bottom = 132.0
 text = "on_floor"
 
 [node name="on_wall" type="Label" parent="."]
+layout_mode = 0
 offset_left = 7.0
 offset_top = 129.0
 offset_right = 66.0
@@ -56,6 +62,7 @@ offset_bottom = 155.0
 text = "on_wall"
 
 [node name="on_ceiling" type="Label" parent="."]
+layout_mode = 0
 offset_left = 7.0
 offset_top = 154.0
 offset_right = 84.0
@@ -63,6 +70,7 @@ offset_bottom = 180.0
 text = "on_ceiling"
 
 [node name="floor_angle" type="Label" parent="."]
+layout_mode = 0
 offset_left = 7.0
 offset_top = 180.0
 offset_right = 93.0
@@ -71,6 +79,7 @@ text = "floor_angle
 "
 
 [node name="velmag" type="Label" parent="."]
+layout_mode = 0
 offset_left = 7.0
 offset_top = 84.0
 offset_right = 63.0
@@ -78,6 +87,7 @@ offset_bottom = 110.0
 text = "velmag"
 
 [node name="groundcheck" type="Label" parent="."]
+layout_mode = 0
 offset_left = 13.0
 offset_top = 208.0
 offset_right = 53.0
@@ -85,7 +95,7 @@ offset_bottom = 234.0
 text = "groundcheck"
 
 [node name="copyright" type="Label" parent="."]
-anchors_preset = 3
+layout_mode = 0
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
@@ -102,6 +112,7 @@ scale = Vector2(0.0258919, 0.0258919)
 texture = ExtResource("3_4xomu")
 
 [node name="ceiling_normal" type="Label" parent="."]
+layout_mode = 0
 offset_left = 12.0
 offset_top = 284.0
 offset_right = 98.0
@@ -109,6 +120,7 @@ offset_bottom = 310.0
 text = "ceiling_normal"
 
 [node name="floor_normal" type="Label" parent="."]
+layout_mode = 0
 offset_left = 12.0
 offset_top = 235.0
 offset_right = 112.0
@@ -117,7 +129,7 @@ text = "floor_normal
 "
 
 [node name="wall_normal" type="Label" parent="."]
-anchors_preset = 2
+layout_mode = 0
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 15.0
@@ -128,6 +140,7 @@ grow_vertical = 0
 text = "wall_normal"
 
 [node name="in_water" type="Label" parent="."]
+layout_mode = 0
 offset_left = 15.0
 offset_top = 308.0
 offset_right = 116.0
@@ -135,6 +148,7 @@ offset_bottom = 334.0
 text = "in_water"
 
 [node name="snapvector" type="Label" parent="."]
+layout_mode = 0
 offset_left = 13.0
 offset_top = 331.0
 offset_right = 114.0
