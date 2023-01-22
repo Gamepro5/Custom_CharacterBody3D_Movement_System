@@ -253,7 +253,7 @@ func _physics_process(delta):
 							var normal = snap_ground_check.get_normal(i)
 							if (normal.angle_to(Vector3.UP) <= max_flr_ang):
 								floor_collision_normal = normal
-							elif rad_to_deg(normal.angle_to(Vector3.UP)) < 90:
+							elif rad_to_deg(normal.angle_to(Vector3.UP)) < 91:
 								average_normal += normal
 						var fallback_average_normal = average_normal
 						average_normal = average_normal.normalized()
@@ -326,7 +326,7 @@ func _physics_process(delta):
 						floor_collision_normal_override += col.get_normal(i)
 						floor_collision_normal_overrides.append(floor_collision_normal_override)
 					else: #collision is not the floor. it is either a ceiling or a wall.
-						if rad_to_deg(col.get_angle(i, Vector3.UP)) > 90: #collision is ceiling
+						if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91: #collision is ceiling
 							ceiling_collision_normal += col.get_normal(i)
 							ceiling_collision_normals.append(ceiling_collision_normal)
 						else:

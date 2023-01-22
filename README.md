@@ -15,7 +15,6 @@ Features:
 
 
 To-do:
-- Await Godot to fix bad collision precision, especially above y=250 and why convex meshes corners can sometimes act like walls to the bottom most part of a capsule. (This can be fixed by using a float=64 build of the engine)
 - Fix platform bugs
 
 # Don't forget to read [the license](/LICENSE.md)! This project is the result of 2 years of study and hard work.
