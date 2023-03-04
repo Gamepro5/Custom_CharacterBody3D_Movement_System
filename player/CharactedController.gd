@@ -293,7 +293,7 @@ func _physics_process(delta):
 			#get the friction of the floor:
 			inherited_vel += ground_check.get_collider_velocity() # inherit platform velocity
 			var collider = ground_check.get_collider()
-			if !(collider is CSGCombiner3D or (collider is CharacterBody3D and collider is not self)):
+			if !(collider is CSGCombiner3D or (collider is CharacterBody3D and collider != self)):
 				var collider_physics_material = collider.get_physics_material_override()
 				var floor_friction = 1;
 				if collider_physics_material:
