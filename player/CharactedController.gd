@@ -121,7 +121,6 @@ func apply_impulse(vector: Vector3, position: Vector3 = Vector3.ZERO):
 
 func _physics_process(delta):
 	
-	inherited_vel = Vector3.ZERO
 	var old_pos = position
 		
 	var max_flr_ang = deg_to_rad(max_floor_angle)
@@ -160,8 +159,11 @@ func _physics_process(delta):
 		if Input.is_action_just_pressed("jump") and !noclip and !in_water:
 			if on_floor:
 				vel.y = 0
-				#apply_impulse(dir*current_speed + Vector3(0,JUMP_vel,0))
-				apply_impulse(Vector3(0,JUMP_vel,0))
+				var impulse_vel = Vector3(0,JUMP_vel,0)
+				if (inherited_vel.y > 0):
+					impulse_vel.y += impulse_vel.y
+				impulse_vel += Vector3(inherited_vel.x, 0, inherited_vel.z)
+				apply_impulse(impulse_vel)
 				$SoundEffectPlayer2.play_sound(FootStepPlayer.getRandomFootstepPath(FootStepPlayer.groundtype), 1.1, 1)
 			elif on_wall and wall_jumps > 0:
 				apply_impulse(((wall_collision_normal * 5) + (Vector3.UP * JUMP_vel)) + vel.slide(wall_collision_normal) * Vector3(1,0,1))
@@ -229,21 +231,23 @@ func _physics_process(delta):
 		vel.x = 0
 		vel.z = 0
 
-	
 	$snapVector.set_rotation(- $snapVector.get_parent().rotation)
 	$snapVector.target_position = snap_vector;
 	if (!noclip):
+		inherited_vel = Vector3.ZERO
 		var before_ground_check_vel = vel
 		var ground_check = null
 		if (snap_vector != Vector3.ZERO): # snap vector is only unset from zero in the "in air" part of this code, where a collision would set it to Vector3.DOWN
 			ground_check = move_and_collide(snap_vector*snap_magnitude*(1+(delta*10)), true, 0.001, true, 5) # ground check == true does not nessesarily mean that we are on the floor. we need to double check with the snap check
 		if ground_check:
+			inherited_vel = ground_check.get_collider_velocity() # inherit platform velocity
+			move_and_collide(inherited_vel*delta)
 			FootStepPlayer.update_groundtype(ground_check)
 			hud.get_node("groundcheck").text = "groundcheck: true"
 			floor_collision_normal = Vector3.UP
 			if floor_collision_normal != Vector3.ZERO:
 				floor_collision_normal = Vector3.ZERO
-				if vel.length() > 0:
+				if vel.length() > 0 or inherited_vel != Vector3.ZERO:
 					var snap_ground_check = move_and_collide(snap_vector*0.001*(1+(delta*10)), true, 0.001, true, 3) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector. The (1+(delta*10)) makes the snap vector larger if your physics frame rate is low, with a multiplier limit of 1.
 					if !snap_ground_check:
 						snap_ground_check = move_and_collide(snap_vector*snap_magnitude*(1+(delta*10)), false, 0.001, false, 3)
@@ -291,7 +295,6 @@ func _physics_process(delta):
 				on_floor = false
 				snap_vector = Vector3.ZERO
 			#get the friction of the floor:
-			inherited_vel += ground_check.get_collider_velocity() # inherit platform velocity
 			var collider = ground_check.get_collider()
 			if !(collider is CSGCombiner3D or (collider is CharacterBody3D and collider != self)):
 				var collider_physics_material = collider.get_physics_material_override()
@@ -467,7 +470,7 @@ func _physics_process(delta):
 			
 			if !(in_water and dir.length() > 0):
 				vel += current_gravity * delta
-			velocity = vel + inherited_vel
+			velocity = vel
 			var col = move_and_collide(velocity*delta, true, 0.001, true, 5)
 			if col:
 				var ground_collision_normals = []
@@ -519,7 +522,7 @@ func _physics_process(delta):
 		#	on_wall = false
 			
 			
-		velocity = vel + inherited_vel
+		velocity = vel
 		move_and_collide(velocity*delta, false, 0.001, false)
 		
 		#previously_on_floor = on_floor
