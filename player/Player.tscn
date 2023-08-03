@@ -5,14 +5,16 @@
 [ext_resource type="Script" path="res://player/FootStepPlayer.gd" id="3_x3wm7"]
 [ext_resource type="Script" path="res://lib/GeneralAudioPlayer.gd" id="4_1mg0h"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_e3tg1"]
-size = Vector3(1, 2, 1)
+[sub_resource type="CylinderMesh" id="CylinderMesh_w538w"]
+top_radius = 0.45
+bottom_radius = 0.45
+height = 1.5
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_m52cf"]
-size = Vector3(1, 2, 1)
+[sub_resource type="BoxShape3D" id="BoxShape3D_k3a2l"]
+size = Vector3(0.75, 1.5, 0.75)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_4borl"]
-size = Vector3(1, 2, 1)
+[sub_resource type="BoxShape3D" id="BoxShape3D_wurum"]
+size = Vector3(0.75, 1.5, 0.75)
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 axis_lock_angular_x = true
@@ -23,7 +25,7 @@ script = ExtResource("1_xse20")
 [node name="Torso" type="Node3D" parent="."]
 
 [node name="Head" type="Node3D" parent="Torso"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.724702, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.553778, 0)
 
 [node name="FirstPersonCam" type="Camera3D" parent="Torso/Head"]
 current = true
@@ -54,15 +56,15 @@ debug_shape_custom_color = Color(0, 0, 1, 1)
 [node name="UI" parent="." instance=ExtResource("2_hkjrl")]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("BoxMesh_e3tg1")
+mesh = SubResource("CylinderMesh_w538w")
 
 [node name="CollisionHull" type="CollisionShape3D" parent="."]
-shape = SubResource("BoxShape3D_m52cf")
+shape = SubResource("BoxShape3D_k3a2l")
 
 [node name="Area3D" type="Area3D" parent="."]
 
 [node name="CollisionHull" type="CollisionShape3D" parent="Area3D"]
-shape = SubResource("BoxShape3D_4borl")
+shape = SubResource("BoxShape3D_wurum")
 
 [node name="FootStepPlayer" type="AudioStreamPlayer3D" parent="."]
 script = ExtResource("3_x3wm7")

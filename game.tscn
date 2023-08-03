@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dqkmjkoqkdufd" path="res://player/Player.tscn" id="1_6o2rv"]
 [ext_resource type="Script" path="res://game.gd" id="1_mrnmh"]
-[ext_resource type="PackedScene" uid="uid://bacu6i87s4l2k" path="res://maps/dev_test/dev_test.tscn" id="2_hb246"]
+[ext_resource type="PackedScene" uid="uid://b0x4y55x4xjln" path="res://maps/catwalk/catwalk.tscn" id="3_46c65"]
 
 [node name="Game" type="Node"]
 script = ExtResource("1_mrnmh")
@@ -14,4 +14,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.49288, 0)
 
 [node name="Node" type="Node3D" parent="."]
 
-[node name="dev_test" parent="Node" instance=ExtResource("2_hb246")]
+[node name="catwalk" parent="Node" instance=ExtResource("3_46c65")]

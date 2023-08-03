@@ -1,7 +1,6 @@
 extends Node3D
 
-# CREDITS: 
-# Code by Btan2 (https://thelowrooms.com/articledir/programming_stepclimbing.php) and updated by Gamepro5 (https://gamepro5.com). Concept by ID Software
+
 
 var endpos : Vector3
 var fraction : float
@@ -74,6 +73,7 @@ func intersect_groups(origin : Vector3, shape : Shape3D, e, mask):
 	params.collide_with_bodies = true
 	params.exclude = [e]
 	params.set_collision_mask(mask)
+	params.margin = 0
 	
 	hit = false
 	
@@ -112,7 +112,7 @@ func standard(origin : Vector3, dest : Vector3, shape : Shape3D, e, mask):
 	results = space_state.cast_motion(params)
 	
 	if !results.is_empty():
-		fraction = results[0]
+		fraction = results[1]
 		endpos = origin + (dest - origin).normalized() * (origin.distance_to(dest) * fraction)
 	else:
 		fraction = 1
@@ -131,8 +131,7 @@ func standard(origin : Vector3, dest : Vector3, shape : Shape3D, e, mask):
 	else:
 		normal = Vector3.UP
 
-
-func full(origin : Vector3, dest : Vector3, shape : Shape3D, e):
+func full(origin : Vector3, dest : Vector3, shape : Shape3D, e, mask):
 	var params : PhysicsShapeQueryParameters3D
 	var space_state
 	var results
@@ -146,6 +145,7 @@ func full(origin : Vector3, dest : Vector3, shape : Shape3D, e):
 	params.exclude = [e]
 	params.motion = dest - origin
 	hit = false
+	params.set_collision_mask(mask)
 	
 	# Get distance fraction and position of first collision
 	space_state = get_world_3d().direct_space_state
@@ -173,7 +173,7 @@ func full(origin : Vector3, dest : Vector3, shape : Shape3D, e):
 		normal = results.get("normal")
 	else:
 		normal = Vector3.UP
-	
+	print(results)
 	# Get collision group
 	if col_id != 0:
 		results = space_state.intersect_shape(params, 8)

@@ -1,0 +1,14 @@
+[remap]
+
+importer="qodot.map"
+type="Resource"
+uid="uid://b2a2ro14qk5nm"
+path="res://.godot/imported/Catwalk.map-e9565870e490bb8121d57e628b0c3984.tres"
+
+[deps]
+
+source_file="res://maps/catwalk/Catwalk.map"
+dest_files=["res://.godot/imported/Catwalk.map-e9565870e490bb8121d57e628b0c3984.tres"]
+
+[params]
+
