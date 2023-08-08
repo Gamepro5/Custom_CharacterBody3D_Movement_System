@@ -26,10 +26,10 @@ func _input(event: InputEvent) -> void:
 		var vertical: float = -mouse_axis.y * 0.05
 		
 		mouse_axis = Vector2(0,0)
-		rotate_y(deg_to_rad(horizontal))
-		$Head.rotate_x(deg_to_rad(vertical))
+		$Torso.rotate_y(deg_to_rad(horizontal))
+		$Torso/Head.rotate_x(deg_to_rad(vertical))
 		#print($Head.rotation)
-		$Head.rotation.x = clamp($Head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+		$Torso/Head.rotation.x = clamp($Torso/Head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
 func _physics_process(delta):
 	# Add the gravity.
@@ -43,7 +43,7 @@ func _physics_process(delta):
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "forward", "backward")
-	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	var direction = ($Torso.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
@@ -52,4 +52,5 @@ func _physics_process(delta):
 		velocity.z = move_toward(velocity.z, 0, SPEED)
 
 	move_and_slide()
-	print(is_on_floor())
+	print(velocity)
+	#print(is_on_floor())

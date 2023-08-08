@@ -2,20 +2,27 @@
 
 [ext_resource type="Script" path="res://PrimitiveCharacterBody.gd" id="1_6ul61"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g7pkj"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_c4tqj"]
+size = Vector3(0.75, 1.5, 0.75)
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_mtl3s"]
+[sub_resource type="BoxMesh" id="BoxMesh_6cvdx"]
+size = Vector3(0.75, 1.5, 0.75)
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
+floor_constant_speed = true
+floor_max_angle = 1.13446
+floor_snap_length = 5.0
 script = ExtResource("1_6ul61")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("CapsuleShape3D_g7pkj")
+shape = SubResource("BoxShape3D_c4tqj")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("CapsuleMesh_mtl3s")
+mesh = SubResource("BoxMesh_6cvdx")
 
-[node name="Head" type="Node3D" parent="."]
+[node name="Torso" type="Node3D" parent="."]
 
-[node name="Camera3D" type="Camera3D" parent="Head"]
+[node name="Head" type="Node3D" parent="Torso"]
+
+[node name="Camera3D" type="Camera3D" parent="Torso/Head"]
 current = true

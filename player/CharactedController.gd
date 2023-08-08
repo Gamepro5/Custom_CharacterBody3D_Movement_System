@@ -53,7 +53,7 @@ var snap_vector = Vector3.ZERO
 var snap_magnitude = 1#0.5
 var previous_dir = Vector3.ZERO
 @export var noclip = false
-@onready var mouse_sensitivity = 0.15
+@onready var mouse_sensitivity = 0.05
 var wall_collision_normal = Vector3.ZERO #needed so we can choose how we apply the input vel when touching walls
 var ceiling_collision_normal = Vector3.ZERO
 var floor_collision_normal = Vector3.ZERO
@@ -145,6 +145,7 @@ func floor_collision_solver(delta):
 	vel.y = (-floor_collision_normal.z*vel.z-floor_collision_normal.x*vel.x)/floor_collision_normal.y
 	if (floor_collision_normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
 		vel.y = 0
+	pass
 
 func ceiling_collision_solver(delta):
 	if (wall_collision_normal != Vector3.ZERO):
@@ -200,7 +201,6 @@ func wall_collision_solver(delta):
 				if ceiling_collision_normal == Vector3.ZERO:
 					on_wall = true
 					if on_floor:
-						#print("FUCKY WUCKY")
 						var wall_floor_tangent = wall_collision_normal.cross(floor_collision_normal).normalized()
 						vel = wall_floor_tangent * vel.dot(wall_floor_tangent)
 					else:
@@ -209,21 +209,21 @@ func wall_collision_solver(delta):
 					if vel.y > 0 and floor_collision_normal == Vector3.ZERO:
 						vel.y = 0 #prevent wall climbing
 		
-func ground_movement(delta, ground_check): #needs work
+func ground_movement(delta, ground_check):
 	inherited_vel = ground_check.get_collider_velocity() # inherit platform velocity
 	move_and_collide(inherited_vel*delta)
 	FootStepPlayer.update_groundtype(ground_check)
 	floor_collision_normal = Vector3.ZERO
-	var snap_ground_check = move_and_collide(snap_vector*0.001, true, 0, true, 3) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector. The (1+(delta*10)) makes the snap vector larger if your physics frame rate is low, with a multiplier limit of 1.
+	var snap_ground_check = move_and_collide(snap_vector*0.001, true, 0.001, false, 5) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector. The (1+(delta*10)) makes the snap vector larger if your physics frame rate is low, with a multiplier limit of 1.
 	if !snap_ground_check: #this prevents small false positives from adding up and making the player appear to slide down a slope even with zero velocity
-		snap_ground_check = move_and_collide(snap_vector*snap_magnitude, false, 0.001, false, 3) 
+		snap_ground_check = move_and_collide(snap_vector*snap_magnitude, false, 0.001, false, 5) 
 	if snap_ground_check:
 		var average_normal = Vector3.ZERO
 		for i in range(snap_ground_check.get_collision_count()):
 			var normal = snap_ground_check.get_normal(i)
 			if (normal.angle_to(Vector3.UP) <= max_flr_ang_rad):
 				floor_collision_normal = normal
-			elif rad_to_deg(normal.angle_to(Vector3.UP)) < 90:
+			elif rad_to_deg(normal.angle_to(Vector3.UP)) < 91:
 				average_normal += normal
 		var fallback_average_normal = average_normal
 		average_normal = average_normal.normalized()
@@ -233,7 +233,7 @@ func ground_movement(delta, ground_check): #needs work
 			if (average_normal.angle_to(Vector3.UP) <= max_flr_ang_rad):
 				floor_collision_normal = average_normal
 			else:
-				var verticalwallcol = move_and_collide(Vector3(average_normal.x,0,average_normal.z),true) #this is for the edge case of if the "slope" that we consider to be too steep to be a floor averages to not be a floor, but there is still the possibility that we are wedged between a steep slop and a perfectly straight wall. this straight wall's normal would not have been reported until now because the gorund check only checks under the player.
+				var verticalwallcol = move_and_collide(Vector3(average_normal.x,0,average_normal.z), true, 0.001, true) #this is for the edge case of if the "slope" that we consider to be too steep to be a floor averages to not be a floor, but there is still the possibility that we are wedged between a steep slop and a perfectly straight wall. this straight wall's normal would not have been reported until now because the gorund check only checks under the player.
 				if verticalwallcol:
 					fallback_average_normal += verticalwallcol.get_normal()
 					fallback_average_normal = fallback_average_normal.normalized()
@@ -274,47 +274,53 @@ func ground_movement(delta, ground_check): #needs work
 		
 		var col = move_and_collide(vel*delta, true, 0.001, true, 4)
 		var floor_collision_normal_override = Vector3.ZERO
-		var floor_collision_normal_overrides = []
 		var wall_collision_normal_override = Vector3.ZERO
-		var wall_collision_normal_overrides = []
+		var ceiling_collision_normal_override = Vector3.ZERO
+		#var floor_collision_normal_overrides = []
+		#var wall_collision_normal_overrides = []
 		if col:
 			wall_collision_normal = Vector3.ZERO
 			ceiling_collision_normal = Vector3.ZERO
 			for i in range(col.get_collision_count()):
 				var normal = col.get_normal(i)
 				if (normal.angle_to(Vector3.UP) <= max_flr_ang_rad): #slope counts as the floor
-					floor_collision_normal_override += col.get_normal(i)
-					floor_collision_normal_overrides.append(floor_collision_normal_override)
+					floor_collision_normal_override = normal
+					#floor_collision_normal_override += col.get_normal(i)
+					#floor_collision_normal_overrides.append(floor_collision_normal_override)
 				else: #collision is not the floor. it is either a ceiling or a wall.
 					if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91: #collision is ceiling
-						ceiling_collision_normal += col.get_normal(i)
-						ceiling_collision_normals.append(ceiling_collision_normal)
+						ceiling_collision_normal_override = normal
+						#ceiling_collision_normal += col.get_normal(i)
+						#ceiling_collision_normals.append(ceiling_collision_normal)
 					else: #collision is wall
-						wall_collision_normal_override += col.get_normal(i)
-						wall_collision_normal_overrides.append(wall_collision_normal_override)
+						wall_collision_normal_override = normal
+						#wall_collision_normal_override += col.get_normal(i)
+						#wall_collision_normal_overrides.append(wall_collision_normal_override)
 						
-			if floor_collision_normal_overrides.size() > 0:
-				floor_collision_normal_override /= floor_collision_normal_overrides.size()
-				floor_collision_normal = floor_collision_normal_override.normalized()
+			#if floor_collision_normal_overrides.size() > 0:
+			#	floor_collision_normal_override /= floor_collision_normal_overrides.size()
+			#	floor_collision_normal = floor_collision_normal_override.normalized()
 				
-			if ceiling_collision_normals.size() > 0:	
-				ceiling_collision_normal /= ceiling_collision_normals.size()
-				ceiling_collision_normal = ceiling_collision_normal.normalized()
+			#if ceiling_collision_normals.size() > 0:	
+			#	ceiling_collision_normal /= ceiling_collision_normals.size()
+			#	ceiling_collision_normal = ceiling_collision_normal.normalized()
 				
-			if wall_collision_normal_overrides.size() > 0:
-				wall_collision_normal_override /= wall_collision_normal_overrides.size()
-				wall_collision_normal = wall_collision_normal_override.normalized()
+			#if wall_collision_normal_overrides.size() > 0:
+				#print(wall_collision_normal_overrides)
+				#wall_collision_normal_override /= wall_collision_normal_overrides.size()
+			#	wall_collision_normal = wall_collision_normal_override.normalized()
 			
-			if (ceiling_collision_normal != Vector3.ZERO):
-				
+			if (ceiling_collision_normal_override != Vector3.ZERO):
 				on_ceiling = true
+				ceiling_collision_normal = ceiling_collision_normal_override
 				ceiling_collision_solver(delta)
 			else:
 				on_ceiling = false
-			#if wall_collision_normal_overrides.size() > 0 and wall_collision_normal != Vector3.ZERO:
-			if wall_collision_normal != Vector3.ZERO:
+			if wall_collision_normal_override != Vector3.ZERO:
+				wall_collision_normal = wall_collision_normal_override
 				wall_collision_solver(delta)
-			if floor_collision_normal_overrides.size() > 0 and floor_collision_normal != Vector3.ZERO:
+			if floor_collision_normal_override != Vector3.ZERO:
+				floor_collision_normal = floor_collision_normal_override
 				floor_collision_solver(delta)
 
 func air_movement(delta):

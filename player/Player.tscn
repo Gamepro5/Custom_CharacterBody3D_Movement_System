@@ -21,6 +21,7 @@ axis_lock_angular_x = true
 axis_lock_angular_y = true
 axis_lock_angular_z = true
 script = ExtResource("1_xse20")
+JUMP_vel = 20
 
 [node name="Torso" type="Node3D" parent="."]
 
@@ -28,10 +29,12 @@ script = ExtResource("1_xse20")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.553778, 0)
 
 [node name="FirstPersonCam" type="Camera3D" parent="Torso/Head"]
+visible = false
 current = true
 
 [node name="ThirdPersonCam" type="Camera3D" parent="Torso/Head"]
 transform = Transform3D(1, 0, 0, 0, 0.841294, 0.540578, 0, -0.540578, 0.841294, 0, 5.91603, 7.23098)
+current = true
 
 [node name="Velocity" type="RayCast3D" parent="."]
 collide_with_bodies = false

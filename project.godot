@@ -86,5 +86,4 @@ common/physics_jitter_fix=0.0
 common/enable_object_picking=false
 jolt_3d/collisions/use_shape_margins=false
 jolt_3d/solver/position_correction=100.0
-jolt_3d/solver/contact_speculative_distance=0.0
 jolt_3d/solver/contact_allowed_penetration=0.0
