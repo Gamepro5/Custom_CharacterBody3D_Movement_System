@@ -34,7 +34,6 @@ current = true
 
 [node name="ThirdPersonCam" type="Camera3D" parent="Torso/Head"]
 transform = Transform3D(1, 0, 0, 0, 0.841294, 0.540578, 0, -0.540578, 0.841294, 0, 5.91603, 7.23098)
-current = true
 
 [node name="Velocity" type="RayCast3D" parent="."]
 collide_with_bodies = false

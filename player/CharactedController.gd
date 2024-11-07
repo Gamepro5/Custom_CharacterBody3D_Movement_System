@@ -63,7 +63,7 @@ var air_jumps = 0 #DON'T TOUCH THIS VALUE
 var wall_jumps = 0 #DON'T TOUCH THIS VALUE
 var input_dir = Vector2.ZERO
 var previously_on_floor = false
-var debug = null
+@onready var debug = $UI
 var in_area = false
 var inherited_vel = Vector3.ZERO
 @export var stair_step_height = 1.0
@@ -77,6 +77,7 @@ var uncrouch_check_run = false
 @export var crouched = false
 @onready var trace = Trace.new()
 var ceiling_collision_normals = []
+var remaining_vel = vel
 
 
 func crouch():
@@ -140,83 +141,85 @@ func apply_impulse(vector: Vector3, position: Vector3 = Vector3.ZERO):
 	vel += vector
 	snap_vector = Vector3.ZERO
 
-func floor_collision_solver(delta):
-	vel.y = 0
-	vel.y = (-floor_collision_normal.z*vel.z-floor_collision_normal.x*vel.x)/floor_collision_normal.y
+func floor_collision_solver(_vel, delta):
+	_vel.y = 0
+	_vel.y = (-floor_collision_normal.z*_vel.z-floor_collision_normal.x*_vel.x)/floor_collision_normal.y
 	if (floor_collision_normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
-		vel.y = 0
-	pass
+		_vel.y = 0
+	return _vel
 
-func ceiling_collision_solver(delta):
+func ceiling_collision_solver(_vel, delta):
 	if (wall_collision_normal != Vector3.ZERO):
 		var wall_floor_tangent = wall_collision_normal.cross(floor_collision_normal).normalized()
-		vel = wall_floor_tangent * vel.dot(wall_floor_tangent)
+		_vel = wall_floor_tangent * _vel.dot(wall_floor_tangent)
 		var ceiling_floor_tangent = ceiling_collision_normal.cross(floor_collision_normal).normalized()
 		if wall_floor_tangent.dot(ceiling_floor_tangent) <= 0:
-			vel.x = 0
-			vel.z = 0
+			_vel.x = 0
+			_vel.z = 0
 		else:
-			vel = ceiling_floor_tangent * vel.dot(ceiling_floor_tangent)
+			_vel = ceiling_floor_tangent * _vel.dot(ceiling_floor_tangent)
 		
 		ceiling_floor_tangent = ceiling_collision_normal.cross(floor_collision_normal).normalized()
-		vel = ceiling_floor_tangent * vel.dot(ceiling_floor_tangent)
+		_vel = ceiling_floor_tangent * _vel.dot(ceiling_floor_tangent)
 		
 	else:
 		var ceiling_floor_tangent = ceiling_collision_normal.cross(floor_collision_normal).normalized()
-		vel = ceiling_floor_tangent * vel.dot(ceiling_floor_tangent)
+		_vel = ceiling_floor_tangent * _vel.dot(ceiling_floor_tangent)
+	return _vel
 
-func wall_collision_solver(delta):
+func wall_collision_solver(_vel, delta):
 	#do the stair stepping check before treating the collision like a wall!
-	if ceiling_collision_normal == Vector3.ZERO:
-		if (vel.length() > 0):
-				
-			#make a new collision hull that is slightly wider (so we can step even with low velocities and not get false negatives)
-			var StairStepShape = BoxShape3D.new()
-			StairStepShape.size = collisionHull.size
+	#if ceiling_collision_normal == Vector3.ZERO:
+	if (_vel.length() > 0):
 			
-			# Get destination position that is one step-size above the intended move
-			var dest = position + Vector3(vel.x * delta, stair_step_height, vel.z * delta) # if your vel isn't large enough, this won't work :(
-				
-			# 1st Trace: check for collisions one stepsize above the original position
-			var up = position + Vector3.UP * stair_step_height
-			trace.standard(position, up, StairStepShape, self, 9)
-				
-			dest.y = trace.endpos.y
-				
-			# 2nd Trace: Check for collisions one stepsize above the original position
-			# and along the intended destination
-			trace.standard(trace.endpos, dest, StairStepShape, self, 9)
-				
-			# 3rd Trace: Check for collisions below the stepsize until 
-			# level with original position
-			var down = Vector3(trace.endpos.x, position.y, trace.endpos.z)
-			trace.standard(trace.endpos, down, StairStepShape, self, 9)
-				
-			# Move to trace collision position if step is higher than original position and not steep 
-			if trace.endpos.y > position.y and trace.normal.angle_to(Vector3.UP) <= max_flr_ang_rad: #stair step sucessful, not a wall.
-				global_transform.origin = trace.endpos
-				on_wall = false
-				wall_collision_normal = Vector3.ZERO
-			else:
-				if ceiling_collision_normal == Vector3.ZERO:
-					on_wall = true
-					if on_floor:
-						var wall_floor_tangent = wall_collision_normal.cross(floor_collision_normal).normalized()
-						vel = wall_floor_tangent * vel.dot(wall_floor_tangent)
-					else:
-						vel += current_gravity * delta
-						vel = vel.slide(wall_collision_normal)
-					if vel.y > 0 and floor_collision_normal == Vector3.ZERO:
-						vel.y = 0 #prevent wall climbing
+		#make a new collision hull that is slightly wider (so we can step even with low velocities and not get false negatives)
+		var StairStepShape = BoxShape3D.new()
+		StairStepShape.size = collisionHull.size
 		
+		# Get destination position that is one step-size above the intended move
+		var dest = position + Vector3(_vel.x * delta, stair_step_height, _vel.z * delta) # if your vel isn't large enough, this won't work :(
+			
+		# 1st Trace: check for collisions one stepsize above the original position
+		var up = position + Vector3.UP * stair_step_height
+		trace.standard(position, up, StairStepShape, self, 9)
+			
+		dest.y = trace.endpos.y
+			
+		# 2nd Trace: Check for collisions one stepsize above the original position
+		# and along the intended destination
+		trace.standard(trace.endpos, dest, StairStepShape, self, 9)
+			
+		# 3rd Trace: Check for collisions below the stepsize until 
+		# level with original position
+		var down = Vector3(trace.endpos.x, position.y, trace.endpos.z)
+		trace.standard(trace.endpos, down, StairStepShape, self, 9)
+			
+		# Move to trace collision position if step is higher than original position and not steep 
+		if trace.endpos.y > position.y and trace.normal.angle_to(Vector3.UP) <= max_flr_ang_rad: #stair step sucessful, not a wall.
+			global_transform.origin = trace.endpos
+			on_wall = false
+			wall_collision_normal = Vector3.ZERO
+		else:
+			if ceiling_collision_normal == Vector3.ZERO:
+				on_wall = true
+				if on_floor:
+					var wall_floor_tangent = wall_collision_normal.cross(floor_collision_normal).normalized()
+					_vel = wall_floor_tangent * _vel.dot(wall_floor_tangent)
+				else:
+					_vel += current_gravity * delta
+					_vel = _vel.slide(wall_collision_normal)
+				if _vel.y > 0 and floor_collision_normal == Vector3.ZERO:
+					_vel.y = 0 #prevent wall climbing
+	return _vel
+
 func ground_movement(delta, ground_check):
 	inherited_vel = ground_check.get_collider_velocity() # inherit platform velocity
 	move_and_collide(inherited_vel*delta)
 	FootStepPlayer.update_groundtype(ground_check)
 	floor_collision_normal = Vector3.ZERO
-	var snap_ground_check = move_and_collide(snap_vector*0.001, true, 0.001, false, 5) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector. The (1+(delta*10)) makes the snap vector larger if your physics frame rate is low, with a multiplier limit of 1.
+	var snap_ground_check = move_and_collide(snap_vector*0.001, true, 0.001, true, 5) #we already established that we are on the floor. let's double check. if we aren't, snap down to the floor with a massive snap vector. The (1+(delta*10)) makes the snap vector larger if your physics frame rate is low, with a multiplier limit of 1.
 	if !snap_ground_check: #this prevents small false positives from adding up and making the player appear to slide down a slope even with zero velocity
-		snap_ground_check = move_and_collide(snap_vector*snap_magnitude, false, 0.001, false, 5) 
+		snap_ground_check = move_and_collide(snap_vector*snap_magnitude, false, 0.001, true, 5) 
 	if snap_ground_check:
 		var average_normal = Vector3.ZERO
 		for i in range(snap_ground_check.get_collision_count()):
@@ -234,20 +237,17 @@ func ground_movement(delta, ground_check):
 				floor_collision_normal = average_normal
 			else:
 				var verticalwallcol = move_and_collide(Vector3(average_normal.x,0,average_normal.z), true, 0.001, true) #this is for the edge case of if the "slope" that we consider to be too steep to be a floor averages to not be a floor, but there is still the possibility that we are wedged between a steep slop and a perfectly straight wall. this straight wall's normal would not have been reported until now because the gorund check only checks under the player.
-				if verticalwallcol:
-					fallback_average_normal += verticalwallcol.get_normal()
-					fallback_average_normal = fallback_average_normal.normalized()
-					if (fallback_average_normal.angle_to(Vector3.UP) <= max_flr_ang_rad):
-						floor_collision_normal = fallback_average_normal
+				#if verticalwallcol:
+				#	fallback_average_normal += verticalwallcol.get_normal()
+				#	fallback_average_normal = fallback_average_normal.normalized()
+				#	if (fallback_average_normal.angle_to(Vector3.UP) <= max_flr_ang_rad):
+				#		floor_collision_normal = fallback_average_normal
 		if floor_collision_normal != Vector3.ZERO:
 			wall_collision_normal = Vector3.ZERO
 			on_floor = true
 			air_jumps = max_air_jumps
 			wall_jumps = max_wall_jumps
-			vel.y = 0
-			vel.y = (-floor_collision_normal.z*vel.z-floor_collision_normal.x*vel.x)/floor_collision_normal.y
-			if (floor_collision_normal.y == 0): #safeguard. if the y normal of the slope is 0, it means you are trying to climb a completley vertical wall. Good luck with that lol.
-				vel.y = 0
+			vel = floor_collision_solver(vel, delta)
 		else:
 			on_floor = false
 			if !previously_on_floor:
@@ -271,58 +271,38 @@ func ground_movement(delta, ground_check):
 				current_acceleration = ACCELERATION
 				current_deceleration = DECELERATION
 				current_strafe_deceleration = STRAFE_DECELERATION
+		remaining_vel = vel
 		
-		var col = move_and_collide(vel*delta, true, 0.001, true, 4)
+		var col = move_and_collide(vel*delta, true, 0.001, true, 5)
 		var floor_collision_normal_override = Vector3.ZERO
 		var wall_collision_normal_override = Vector3.ZERO
 		var ceiling_collision_normal_override = Vector3.ZERO
-		#var floor_collision_normal_overrides = []
-		#var wall_collision_normal_overrides = []
+		var floor_collision_normals = []
+		var wall_collision_normals = []
+		var ceiling_collision_normals = []
 		if col:
 			wall_collision_normal = Vector3.ZERO
 			ceiling_collision_normal = Vector3.ZERO
 			for i in range(col.get_collision_count()):
 				var normal = col.get_normal(i)
 				if (normal.angle_to(Vector3.UP) <= max_flr_ang_rad): #slope counts as the floor
-					floor_collision_normal_override = normal
-					#floor_collision_normal_override += col.get_normal(i)
-					#floor_collision_normal_overrides.append(floor_collision_normal_override)
-				else: #collision is not the floor. it is either a ceiling or a wall.
+					floor_collision_normals.push_back(normal)
 					if rad_to_deg(col.get_angle(i, Vector3.UP)) > 91: #collision is ceiling
-						ceiling_collision_normal_override = normal
-						#ceiling_collision_normal += col.get_normal(i)
-						#ceiling_collision_normals.append(ceiling_collision_normal)
+						ceiling_collision_normals.push_back(normal)
 					else: #collision is wall
-						wall_collision_normal_override = normal
-						#wall_collision_normal_override += col.get_normal(i)
-						#wall_collision_normal_overrides.append(wall_collision_normal_override)
-						
-			#if floor_collision_normal_overrides.size() > 0:
-			#	floor_collision_normal_override /= floor_collision_normal_overrides.size()
-			#	floor_collision_normal = floor_collision_normal_override.normalized()
-				
-			#if ceiling_collision_normals.size() > 0:	
-			#	ceiling_collision_normal /= ceiling_collision_normals.size()
-			#	ceiling_collision_normal = ceiling_collision_normal.normalized()
-				
-			#if wall_collision_normal_overrides.size() > 0:
-				#print(wall_collision_normal_overrides)
-				#wall_collision_normal_override /= wall_collision_normal_overrides.size()
-			#	wall_collision_normal = wall_collision_normal_override.normalized()
+						wall_collision_normals.push_back(normal)
+		
+			print("Ceiling: ", ceiling_collision_normals, " Walls: ", wall_collision_normals, " Floors: ", floor_collision_normals)
+			for i in ceiling_collision_normals:
+				ceiling_collision_normal = i
+				vel = ceiling_collision_solver(vel, delta)
+			for i in wall_collision_normals:
+				wall_collision_normal = i
+				vel = wall_collision_solver(vel, delta)
+			for i in floor_collision_normals:
+				floor_collision_normal = i
+				vel = floor_collision_solver(vel, delta)
 			
-			if (ceiling_collision_normal_override != Vector3.ZERO):
-				on_ceiling = true
-				ceiling_collision_normal = ceiling_collision_normal_override
-				ceiling_collision_solver(delta)
-			else:
-				on_ceiling = false
-			if wall_collision_normal_override != Vector3.ZERO:
-				wall_collision_normal = wall_collision_normal_override
-				wall_collision_solver(delta)
-			if floor_collision_normal_override != Vector3.ZERO:
-				floor_collision_normal = floor_collision_normal_override
-				floor_collision_solver(delta)
-
 func air_movement(delta):
 	if !in_area:
 		current_acceleration = ACCELERATION
@@ -507,7 +487,7 @@ func _physics_process(delta):
 		debug.get_node("floor_normal").text = "floor_normal: " + var_to_str(floor_collision_normal)
 		debug.get_node("wall_normal").text = "wall_normal: " + var_to_str(wall_collision_normal)
 		debug.get_node("ceiling_normal").text = "ceiling_normal: " + var_to_str(ceiling_collision_normal)
-		debug.get_node("air_jumps").text = "air_jumps: " + var_to_str(air_jumps)
+		#debug.get_node("air_jumps").text = "air_jumps: " + var_to_str(air_jumps)
 	
 	
 	
